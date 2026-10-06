@@ -1,0 +1,24 @@
+/* Golos Text — весь UI і body-текст слайдів.
+   Unbounded — лише брендові заголовки: логотип, плашки хуків/тез,
+   номери слайдів, «гортай →». Ніколи в UI-контролах. */
+@import url("https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;800&family=Golos+Text:wght@400;500;600;700&display=swap");
+
+:root {
+  --font-ui: "Golos Text", system-ui, sans-serif;
+  --font-brand: "Unbounded", sans-serif;
+
+  /* UI-шкала (px) */
+  --text-page-title: 600 15px/1.3 var(--font-ui);   /* назва поста в шапці */
+  --text-section: 700 14px/1.3 var(--font-ui);      /* заголовки секцій */
+  --text-body: 400 13px/1.55 var(--font-ui);        /* основний */
+  --text-button: 600 13px/1 var(--font-ui);         /* primary; ghost = 500 */
+  --text-label: 600 11.5px/1.3 var(--font-ui);      /* лейбли полів */
+  --text-meta: 400 12px/1.5 var(--font-ui);         /* дати, мета */
+  --text-counter: 400 11px/1 var(--font-ui);        /* лічильники N/M */
+  --text-overline: 600 11px/1.3 var(--font-ui);     /* + letter-spacing .06em, uppercase */
+  --text-badge: 600 11px/1 var(--font-ui);          /* статус-бейджі */
+  --text-type-tag: 700 10.5px/1 var(--font-ui);     /* ХУК/ТЕЗА/ГРАФІК/CTA + letter-spacing .05em */
+
+  /* Логотип: font: 700 16px var(--font-brand); крапка — акцентом:
+     Каруселі<span style="color:var(--ui-accent)">.</span> */
+}

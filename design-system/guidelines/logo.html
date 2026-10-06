@@ -1,0 +1,43 @@
+<!-- @dsCard group="Brand" viewport="720x460" subtitle="Знак, логотип, набір іконок PWA" name="Логотип Gortai" -->
+<!DOCTYPE html><html lang="uk"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<style>
+body{margin:0;background:var(--ui-bg);font-family:var(--font-ui);color:var(--ui-text);padding:18px;display:flex;flex-direction:column;gap:16px}
+h2{font:700 12px var(--font-ui);letter-spacing:.06em;text-transform:uppercase;color:rgba(237,234,228,.35);margin:0}
+.row{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.col{display:flex;flex-direction:column;gap:7px}
+.cap{font:500 10px var(--font-ui);letter-spacing:.06em;text-transform:uppercase;color:rgba(237,234,228,.35)}
+.note{font:400 11.5px/1.55 var(--font-ui);color:rgba(237,234,228,.5);max-width:640px;margin:0}
+.wm{font:700 26px/1 var(--font-brand);letter-spacing:-.02em;color:var(--ui-text)}
+code{font:11px ui-monospace,Menlo,monospace;color:rgba(237,234,228,.6)}
+.card{background:var(--ui-surface);border:1px solid rgba(255,255,255,.09);border-radius:10px;padding:14px;display:flex;gap:16px;align-items:center}
+</style></head><body>
+
+<h2>Логотип</h2>
+<div class="row" style="align-items:center;gap:26px">
+  <span class="wm">Gortai<span style="color:var(--ui-accent)">.</span></span>
+  <div class="card" style="gap:10px"><img src="../assets/logo/gortai-icon-192.png" width="34" height="34" alt=""><span class="wm" style="font-size:19px">Gortai<span style="color:var(--ui-accent)">.</span></span></div>
+  <div class="card" style="gap:8px;background:var(--brand-cream)"><img src="../assets/logo/gortai-icon-light-512.png" width="29" height="29" alt=""><span class="wm" style="font-size:16px;color:var(--brand-ink)">Gortai<span style="color:var(--ui-accent)">.</span></span></div>
+</div>
+<p class="note">Unbounded 700, крапка акцентом — той самий рецепт, що в «Каруселі.». Висота плитки знака — 1.8 кегля логотипу (плитка має внутрішнє поле, тому вона вища за прописну літеру), відступ до слова — 0.28 висоти плитки.</p>
+
+<h2>Знак і набір іконок</h2>
+<div class="row" style="align-items:flex-end">
+  <div class="col"><span class="cap">512 any</span><img src="../assets/logo/gortai-icon-512.png" width="96" height="96" alt=""></div>
+  <div class="col"><span class="cap">512 maskable</span><img src="../assets/logo/gortai-icon-maskable-512.png" width="96" height="96" alt="" style="border-radius:0"></div>
+  <div class="col"><span class="cap">192</span><img src="../assets/logo/gortai-icon-192.png" width="64" height="64" alt=""></div>
+  <div class="col"><span class="cap">180 apple</span><img src="../assets/logo/gortai-apple-touch-180.png" width="52" height="52" alt=""></div>
+  <div class="col"><span class="cap">світла</span><img src="../assets/logo/gortai-icon-light-512.png" width="52" height="52" alt=""></div>
+  <div class="col"><span class="cap">32</span><img src="../assets/logo/gortai-favicon-32.png" width="32" height="32" alt=""></div>
+  <div class="col"><span class="cap">16</span><img src="../assets/logo/gortai-favicon-16.png" width="16" height="16" alt=""></div>
+</div>
+<p class="note">Знак — обрізана монограма <code>g</code>: літера більша за поле й виходить за нижній край, акцентна крапка у верхньому правому куті. Літера — обведений контур гліфа з Unbounded 700, не текст: <code>assets/logo/gortai-mark.svg</code>. На 32 і 16px крапка знята, літера перецентрована й не зрізається. <b style="color:rgba(237,234,228,.7)">Maskable — єдина версія без обрізання</b>: Android ріже кути, тож знак сидить у центральних 60% на суцільному інку.</p>
+
+<h2>Правила</h2>
+<p class="note">Охоронне поле — 12% сторони від краю знака. Мінімальний розмір 16px. theme-color <code>#141414</code> для темної теми, <code>#F5E8D7</code> для світлої. Не обертати знак, не міняти колір крапки, не ставити обрізану версію під маску, не розтягувати літеру, не додавати обведення чи тінь.</p>
+<pre style="margin:0;background:var(--ui-input-bg);border:1px solid rgba(255,255,255,.09);border-radius:8px;padding:12px"><code>"icons": [
+  { "src": "gortai-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+  { "src": "gortai-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+  { "src": "gortai-icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+]</code></pre>
+</body></html>

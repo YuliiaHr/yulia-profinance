@@ -1,0 +1,48 @@
+<!-- @dsCard group="Components" viewport="700x400" subtitle="Кнопки, бейджі, поля, чіпи, теги" name="UI-компоненти" -->
+<!DOCTYPE html><html lang="uk"><head><meta charset="utf-8">
+<link rel="stylesheet" href="../styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css">
+<style>body{margin:0;background:var(--ui-bg);font-family:var(--font-ui);padding:16px;display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}</style></head><body>
+<div class="row">
+  <button style="height:36px;padding:0 18px;border-radius:8px;border:none;background:var(--ui-accent);color:var(--ui-on-accent);font:600 13px var(--font-ui);display:flex;align-items:center;gap:7px"><span class="mdi mdi-calendar-clock" style="font-size:16px"></span>Запланувати</button>
+  <button style="height:36px;padding:0 16px;border-radius:8px;border:1px solid var(--ui-border-button);background:none;color:var(--ui-text);font:500 13px var(--font-ui)">Зберегти чернетку</button>
+  <button style="height:36px;padding:0 16px;border-radius:8px;border:none;background:rgba(242,96,12,.35);color:rgba(20,20,20,.6);font:600 13px var(--font-ui)">Вимкнена</button>
+  <button style="height:30px;padding:0 14px;border-radius:8px;border:none;background:var(--ui-warning);color:var(--ui-on-accent);font:600 12px var(--font-ui)">Оновити підключення</button>
+</div>
+<div class="row">
+  <span style="font:var(--text-badge);padding:3px 9px;border-radius:99px;background:rgba(255,255,255,.09);color:rgba(237,234,228,.7)">Чернетка</span>
+  <span style="font:var(--text-badge);padding:3px 9px;border-radius:99px;background:var(--ui-info-tint);color:var(--ui-info);display:flex;align-items:center;gap:4px"><span class="mdi mdi-calendar-clock" style="font-size:12px"></span>Заплановано</span>
+  <span style="font:var(--text-badge);padding:3px 9px;border-radius:99px;background:var(--ui-success-tint);color:var(--ui-success-light);display:flex;align-items:center;gap:4px"><span class="mdi mdi-loading mdi-spin" style="font-size:12px"></span>Публікується</span>
+  <span style="font:var(--text-badge);padding:3px 9px;border-radius:99px;background:var(--ui-success-tint);color:var(--ui-success-light);display:flex;align-items:center;gap:4px"><span class="mdi mdi-check" style="font-size:12px"></span>Опубліковано</span>
+  <span style="font:var(--text-badge);padding:3px 9px;border-radius:99px;background:var(--ui-accent-tint);color:var(--ui-warning);display:flex;align-items:center;gap:4px"><span class="mdi mdi-alert-circle" style="font-size:12px"></span>Помилка</span>
+</div>
+<div class="row">
+  <span style="font:var(--text-type-tag);letter-spacing:.05em;padding:2px 8px;border-radius:4px;background:var(--ui-accent-tint);color:var(--ui-warning)">ХУК</span>
+  <span style="font:var(--text-type-tag);letter-spacing:.05em;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,.1);color:rgba(237,234,228,.8)">ТЕЗА</span>
+  <span style="font:var(--text-type-tag);letter-spacing:.05em;padding:2px 8px;border-radius:4px;background:var(--ui-success-tint);color:var(--ui-success-light)">ГРАФІК</span>
+  <span style="font:var(--text-type-tag);letter-spacing:.05em;padding:2px 8px;border-radius:4px;background:rgba(245,232,215,.15);color:var(--brand-cream)">CTA</span>
+  <span style="width:20px"></span>
+  <span style="font-size:12.5px;font-weight:600;padding:6px 14px;border-radius:99px;background:var(--ui-accent);color:var(--ui-on-accent)">Усі · 12</span>
+  <span style="font-size:12.5px;font-weight:500;padding:6px 14px;border-radius:99px;border:1px solid rgba(255,255,255,.14);color:var(--ui-text-secondary)">Чернетки · 4</span>
+  <span style="display:flex;background:var(--ui-input-bg);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:3px;gap:3px">
+    <span style="padding:4px 12px;border-radius:6px;background:var(--ui-accent);color:var(--ui-on-accent);font-size:12px;font-weight:600">Текстовий</span>
+    <span style="padding:4px 12px;border-radius:6px;color:var(--ui-text-secondary);font-size:12px;font-weight:500">З графіком</span>
+  </span>
+</div>
+<div style="display:flex;gap:14px">
+  <div style="flex:1;display:flex;flex-direction:column;gap:5px">
+    <div style="display:flex;justify-content:space-between"><label style="font:var(--text-label);color:rgba(237,234,228,.55)">Заголовок</label><span style="font:var(--text-counter);color:var(--ui-text-tertiary)">34/60</span></div>
+    <div style="background:var(--ui-input-bg);border:1px solid var(--ui-border-strong);border-radius:8px;padding:9px 12px;font-size:13.5px;color:var(--ui-text)">Помилка №1 — платити ЄСВ наосліп</div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;gap:5px">
+    <div style="display:flex;justify-content:space-between"><label style="font:var(--text-label);color:rgba(237,234,228,.55)">Текст</label><span style="font:600 11px var(--font-ui);color:var(--ui-accent)">236/240</span></div>
+    <div style="background:var(--ui-input-bg);border:1px solid rgba(242,96,12,.55);border-radius:8px;padding:9px 12px;font-size:13px;color:var(--ui-text)">Майже на ліміті…</div>
+    <div style="display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ui-warning)"><span class="mdi mdi-alert-outline" style="font-size:14px"></span>Майже ліміт — текст може не вміститись</div>
+  </div>
+</div>
+<div style="display:flex;align-items:center;gap:10px;max-width:420px">
+  <div style="flex:1;height:6px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden"><div style="width:62%;height:100%;background:var(--ui-success)"></div></div>
+  <span style="font-size:11.5px;color:rgba(237,234,228,.55);white-space:nowrap">Рендеринг слайдів · 5 з 8</span>
+</div>
+</body></html>

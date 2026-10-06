@@ -1,0 +1,35 @@
+:root {
+  /* ===== ЛОГОТИП І ЗНАК ===== */
+
+  /* Логотип «Gortai.» — Unbounded 700, крапка акцентом */
+  --logo-font: 700 var(--logo-size, 24px)/1 "Unbounded", sans-serif;
+  --logo-tracking: -.02em;
+  --logo-color: var(--ui-text);          /* на темному */
+  --logo-color-ink: var(--brand-ink);    /* на кремі й персику */
+  --logo-dot: var(--ui-accent);          /* крапка — завжди акцент */
+
+  /* Лок-ап: плитка знака має внутрішнє поле, тому вона вища за прописну */
+  --lockup-mark-ratio: 1.8;   /* висота плитки = 1.8 × кегля логотипу */
+  --lockup-gap-ratio: .28;    /* відступ до слова = .28 × висоти плитки */
+
+  /* Геометрія знака (полотно 512) */
+  --mark-radius-ratio: .225;  /* радіус плитки any-іконки: 22.5% сторони */
+  --mark-crop: 6.5%;          /* скільки хвоста літери йде за нижній край */
+  --mark-safe-area: 12%;      /* охоронне поле від краю знака */
+  --mark-min-size: 16px;      /* менше не ставити */
+  --mark-maskable-inset: 20%; /* знак у центральних 60% — Android ріже кути */
+
+  /* Тло під знак */
+  --mark-bg-dark: var(--brand-ink);      /* інкова версія */
+  --mark-bg-light: var(--brand-cream);   /* кремова версія */
+
+  /* PWA */
+  --pwa-theme-dark: #141414;
+  --pwa-theme-light: #F5E8D7;
+
+  /* Файли: assets/logo/gortai-{mark,icon,icon-light,icon-maskable,favicon}.svg
+     PNG: 512, 192, 512-maskable, 512-light, 180-apple-touch, 32, 16.
+     Фавікони 32/16 — окремий крій: крапка знята, літера перецентрована.
+     ЗАБОРОНЕНО: обертати знак, міняти колір крапки, ставити обрізану
+     версію під маску Android, розтягувати літеру, додавати обведення чи тінь. */
+}

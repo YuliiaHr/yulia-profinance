@@ -15,13 +15,18 @@ function load(): Saved {
     if (raw) {
       const s = JSON.parse(raw) as Saved
       // Plans saved by older versions miss newer fields.
-      if (s.plans?.length) return { ...s, plans: s.plans.map((p) => ({ ...newPlan(), ...p })) }
+      if (s.plans?.length) return { ...s, plans: s.plans.map(upgrade) }
     }
   } catch {
     // storage blocked or corrupted — start fresh
   }
   const p = examplePlan()
   return { plans: [p], currentId: p.id }
+}
+
+function upgrade(p: Plan): Plan {
+  const fresh = newPlan()
+  return { ...fresh, ...p, reserve: { ...fresh.reserve, ...p.reserve } }
 }
 
 export function usePlans() {

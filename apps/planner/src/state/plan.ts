@@ -1,6 +1,8 @@
 import type { Row } from '../lib/budget'
 import type { Currency } from '../lib/format'
 import type { ReserveSplit } from '../lib/reserve'
+import { DEFAULT_RATES, type Rates } from '../lib/fx'
+import { BOND_LADDER, INSTRUMENTS, TASKS, type TaskStage, type TaskStatus } from '../data/templates'
 
 export interface Goal {
   id: string
@@ -33,6 +35,54 @@ export interface ChosenInsurance {
   price: number
 }
 
+/** Where an asset is earmarked: a reserve part, a goal id, 'freedom' or '' (free). */
+export type AssetTarget = string
+
+export interface Asset {
+  id: string
+  name: string
+  amount: number
+  currency: Currency
+  target: AssetTarget
+}
+
+export interface Bond {
+  id: string
+  qty: number
+  price: number
+  currency: Currency
+  months: number
+  note: string
+}
+
+export interface Instrument {
+  id: string
+  assetClass: string
+  ticker: string
+  name: string
+  isin: string
+  weight: number
+  currency: string
+  domicile: string
+  description: string
+  ter: number
+  buyNote: string
+  factsheet?: string
+  /** For the rebalance calculator. */
+  qty: number
+  price: number
+}
+
+export interface Task {
+  id: string
+  stage: TaskStage
+  title: string
+  status: TaskStatus
+  date: string
+  note: string
+  link?: string
+}
+
 export interface Plan {
   id: string
   client: string
@@ -42,7 +92,20 @@ export interface Plan {
   fixed: Row[]
   wants: Row[]
   charity: Row[]
-  reserve: { months: number; split: ReserveSplit; saved: number; date: string }
+  reserve: {
+    months: number
+    split: ReserveSplit
+    saved: number
+    date: string
+    /** Shares of the cash part kept in each currency. */
+    cashSplit: Record<Currency, number>
+    ladder: Bond[]
+  }
+  rates: Rates
+  assets: Asset[]
+  portfolio: Instrument[]
+  rebalanceDeposit: number
+  tasks: Task[]
   goals: Goal[]
   protection: ChosenInsurance[]
   freedom: FreedomSettings
@@ -69,7 +132,15 @@ export function newPlan(client = 'Новий клієнт'): Plan {
     fixed: [row('Житло'), row('Продукти'), row('Комунальні'), row('Здоров’я'), row('Транспорт')],
     wants: [row('Кафе'), row('Одяг'), row('Краса'), row('Подорожі'), row('Підписки'), row('Розваги, інше')],
     charity: [row('Благодійність')],
-    reserve: { months: 6, split: { cash: 0.4, bonds: 0.4, deposits: 0.2 }, saved: 0, date: monthFromNow(12) },
+    reserve: {
+      months: 6, split: { cash: 0.4, bonds: 0.4, deposits: 0.2 }, saved: 0, date: monthFromNow(12),
+      cashSplit: { UAH: 0.2, USD: 0.4, EUR: 0.4 }, ladder: [],
+    },
+    rates: { ...DEFAULT_RATES },
+    assets: [],
+    portfolio: INSTRUMENTS.map((x) => ({ ...x, id: uid(), qty: 0, price: 0 })),
+    rebalanceDeposit: 0,
+    tasks: TASKS.map((t) => ({ ...t, id: uid(), status: 'todo' as const, date: '' })),
     goals: [],
     protection: [],
     freedom: {
@@ -90,10 +161,18 @@ export function examplePlan(): Plan {
     for (const r of list) r.amount = amounts[r.name] ?? 0
   }
   p.reserve.saved = 1500
+  p.reserve.ladder = BOND_LADDER.map((b) => ({ ...b, id: uid() }))
+  p.assets = [
+    { id: uid(), name: 'Готівка', amount: 1000, currency: 'USD', target: 'reserve.cash' },
+    { id: uid(), name: 'ОВДП', amount: 500, currency: 'USD', target: 'reserve.bonds' },
+    { id: uid(), name: 'Банка на подорож', amount: 13000, currency: 'UAH', target: '' },
+  ]
+  const trip = uid()
   p.goals = [
     { id: uid(), name: 'Автомобіль', cost: 8000, saved: 0, date: monthFromNow(36) },
-    { id: uid(), name: 'Подорож', cost: 1500, saved: 300, date: monthFromNow(8) },
+    { id: trip, name: 'Подорож', cost: 1500, saved: 300, date: monthFromNow(8) },
   ]
+  p.assets[2].target = trip
   p.freedom = { ...p.freedom, age: 31, retireAge: 60, saveRate: 0.15 }
   return p
 }

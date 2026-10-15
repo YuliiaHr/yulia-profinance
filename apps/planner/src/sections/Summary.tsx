@@ -1,5 +1,7 @@
+import { Fragment } from 'react'
 import { money, percent, type Currency } from '../lib/format'
 import { PROGRAMS } from '../data/insurance'
+import { STAGES, STATUSES, type TaskStage } from '../data/templates'
 import { formatMonth } from './Goals'
 import type { SectionProps } from './types'
 
@@ -92,7 +94,25 @@ export function Summary({ plan, d }: SectionProps) {
       </section>
 
       <section className="summary__block">
-        <h3>5. Фінансова свобода</h3>
+        <h3>5. Активи</h3>
+        {plan.assets.length === 0 ? (
+          <p className="muted">Активи не внесено.</p>
+        ) : (
+          <dl className="kv">
+            <dt>Усього активів</dt><dd>{money(d.assetsTotal, c)}</dd>
+            {d.allocation.filter((l) => l.have > 0 || (l.need ?? 0) > 0).map((l) => (
+              <Fragment key={l.target}>
+                <dt>{l.name}</dt>
+                <dd>{money(l.have, c)}{l.need !== null && <span className="muted"> з {money(l.need, c)}</span>}</dd>
+              </Fragment>
+            ))}
+            <dt>Не розподілено</dt><dd>{money(d.unallocated, c)}</dd>
+          </dl>
+        )}
+      </section>
+
+      <section className="summary__block">
+        <h3>6. Фінансова свобода</h3>
         <dl className="kv">
           <dt>Відкладати</dt><dd>{money(r.monthlySaving, c)} <span className="muted">({percent(f.saveRate)} доходу) до {f.retireAge} років</span></dd>
           <dt>Капітал у {f.retireAge} років</dt><dd>{money(r.capitalAtRetirementReal, c)} <span className="muted">у сьогоднішніх цінах</span></dd>
@@ -103,6 +123,37 @@ export function Summary({ plan, d }: SectionProps) {
           Припущення: дохідність {percent(f.returnRate)} на рік, інфляція {percent(f.inflation)}, ріст доходу{' '}
           {percent(f.incomeGrowth)}, планування до {f.lifeAge} років. Податки не враховані.
         </p>
+      </section>
+
+      <section className="summary__block">
+        <h3>7. Інвестиційний портфель</h3>
+        <div className="table-wrap">
+          <table className="table">
+            <thead><tr><th>Інструмент</th><th>Частка</th><th>На місяць</th></tr></thead>
+            <tbody>
+              {plan.portfolio.map((x) => (
+                <tr key={x.id}><td>{x.ticker} <span className="muted">{x.name}</span></td><td>{percent(x.weight)}</td><td>{money(r.monthlySaving * x.weight, c)}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="summary__block">
+        <h3>8. План дій</h3>
+        {(Object.keys(STAGES) as TaskStage[]).map((stage) => (
+          <div key={stage} className="summary__tasks">
+            <p className="overline">{STAGES[stage]}</p>
+            <ul>
+              {plan.tasks.filter((t) => t.stage === stage).map((t) => (
+                <li key={t.id} className={t.status === 'done' ? 'is-done' : undefined}>
+                  <span>{t.status === 'done' ? '✓' : t.status === 'doing' ? '◐' : '○'} {t.title}</span>
+                  <span className="muted">{STATUSES[t.status]}{t.date && ` · ${new Date(t.date).toLocaleDateString('uk-UA')}`}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </section>
 
       <p className="small muted summary__note">

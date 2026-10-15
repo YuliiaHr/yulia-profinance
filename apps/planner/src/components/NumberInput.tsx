@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { parseNumber, plainNumber } from '../lib/format'
+import { parseNumber } from '../lib/format'
 
 interface Props {
   value: number
@@ -31,7 +31,7 @@ export function NumberInput({ value, onChange, suffix, percent, label, min = 0, 
         aria-label={label}
         inputMode="decimal"
         placeholder={placeholder ?? '0'}
-        value={text ?? (shown === 0 ? '' : percent ? String(shown).replace('.', ',') : plainNumber(shown))}
+        value={text ?? (shown === 0 ? '' : display.format(shown))}
         onFocus={(e) => {
           setText(shown === 0 ? '' : String(shown).replace('.', ','))
           requestAnimationFrame(() => e.target.select())
@@ -48,3 +48,6 @@ export function NumberInput({ value, onChange, suffix, percent, label, min = 0, 
 }
 
 const round = (v: number, digits: number) => Math.round(v * 10 ** digits) / 10 ** digits
+
+// Up to 2 decimals so rates (43,5) and prices (13,12) aren't rounded away.
+const display = new Intl.NumberFormat('uk-UA', { maximumFractionDigits: 2 })

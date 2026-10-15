@@ -93,3 +93,41 @@ describe('insurance data', () => {
     expect(text).not.toMatch(/[ыэъё]/i)
   })
 })
+
+import { convert, splitCash, DEFAULT_RATES } from './fx'
+import { rebalance } from './portfolio'
+
+describe('fx', () => {
+  it('converts through hryvnia', () => {
+    expect(convert(100, 'USD', 'UAH', DEFAULT_RATES)).toBeCloseTo(4350)
+    expect(convert(4350, 'UAH', 'USD', DEFAULT_RATES)).toBeCloseTo(100)
+    expect(convert(118, 'EUR', 'USD', { UAH: 1, USD: 43.5, EUR: 43.5 * 1.18 })).toBeCloseTo(139.24)
+  })
+  it('splits reserve cash like the spreadsheet', () => {
+    // 'Резервний фонд'!C12:C14 with cash = 2500 $
+    const r = splitCash(2500, 'USD', { UAH: 0.2, USD: 0.4, EUR: 0.4 }, { UAH: 1, USD: 43.5, EUR: 43.5 * 1.18 })
+    expect(r).toEqual({ UAH: 22000, USD: 1000, EUR: 900 })
+  })
+})
+
+describe('rebalance', () => {
+  it('splits a deposit to reach target weights', () => {
+    const r = rebalance(
+      [
+        { ticker: 'A', weight: 0.6, qty: 10, price: 10 },
+        { ticker: 'B', weight: 0.4, qty: 10, price: 10 },
+      ],
+      100,
+    )
+    expect(r.total).toBe(200)
+    expect(r.lines[0].trade).toBeCloseTo(8)
+    expect(r.lines[1].trade).toBeCloseTo(2)
+    expect(r.lines[0].actualWeight).toBeCloseTo(0.5)
+  })
+  it('rounds whole shares towards zero', () => {
+    const r = rebalance([{ ticker: 'A', weight: 1, qty: 0, price: 30 }], 100)
+    expect(r.lines[0].trade).toBeCloseTo(3.333, 2)
+    expect(r.lines[0].tradeWhole).toBe(3)
+    expect(r.lines[0].tradeValue).toBe(90)
+  })
+})

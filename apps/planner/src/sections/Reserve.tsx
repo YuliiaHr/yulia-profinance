@@ -3,6 +3,8 @@ import { NumberInput } from '../components/NumberInput'
 import { Term } from '../components/Term'
 import { CURRENCIES, money, percent } from '../lib/format'
 import type { ReserveSplit } from '../lib/reserve'
+import type { Currency } from '../lib/format'
+import { uid, type Bond } from '../state/plan'
 import type { SectionProps } from './types'
 
 export function Reserve({ plan, update, d, go }: SectionProps) {
@@ -13,6 +15,8 @@ export function Reserve({ plan, update, d, go }: SectionProps) {
   const setSplit = (patch: Partial<ReserveSplit>) =>
     update((p) => ({ ...p, reserve: { ...p.reserve, split: { ...p.reserve.split, ...patch } } }))
   const setReserve = (patch: Partial<typeof r>) => update((p) => ({ ...p, reserve: { ...p.reserve, ...patch } }))
+  const setBond = (id: string, patch: Partial<Bond>) =>
+    setReserve({ ladder: r.ladder.map((b) => (b.id === id ? { ...b, ...patch } : b)) })
   const shareOk = Math.abs(reserve.shareTotal - 1) < 0.001
 
   return (
@@ -54,6 +58,61 @@ export function Reserve({ plan, update, d, go }: SectionProps) {
           </Field>
           {!shareOk && <p className="warn">Частки в сумі дають {percent(reserve.shareTotal)}, а мають 100%.</p>}
         </section>
+
+        <section className="group">
+          <h3>Готівка в різних валютах</h3>
+          <p className="small muted">Щоб не залежати від курсу однієї валюти. Курси — на кроці «Активи».</p>
+          <div className="cash-split">
+            {CASH_CURRENCIES.map((cur) => (
+              <div key={cur} className="cash-split__item">
+                <span>{CASH_LABELS[cur]}</span>
+                <NumberInput
+                  label={`Частка готівки, ${cur}`}
+                  percent
+                  value={r.cashSplit[cur]}
+                  max={100}
+                  suffix="%"
+                  onChange={(v) => setReserve({ cashSplit: { ...r.cashSplit, [cur]: v } })}
+                />
+                <b>{money(d.cashByCurrency[cur], cur)}</b>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="group">
+          <h3><Term k="ladder" /></h3>
+          <p className="small muted">Облігації Моно, Сенс, Приват з різними строками: частина грошей повертається щокварталу.</p>
+          <div className="ladder" role="table" aria-label="Драбина облігацій">
+            {r.ladder.length > 0 && (
+              <div className="ladder__head" role="row">
+                <span>Кількість</span><span>Номінал</span><span>Валюта</span><span>Погашення</span><span>Примітка</span><span />
+              </div>
+            )}
+            {r.ladder.map((b) => (
+              <div className="ladder__row" role="row" key={b.id}>
+                <NumberInput label="Кількість" value={b.qty} suffix="шт" onChange={(qty) => setBond(b.id, { qty })} />
+                <NumberInput label="Номінал" value={b.price} onChange={(price) => setBond(b.id, { price })} />
+                <select aria-label="Валюта" value={b.currency} onChange={(e) => setBond(b.id, { currency: e.target.value as Currency })}>
+                  {CASH_CURRENCIES.map((cur) => <option key={cur} value={cur}>{CURRENCIES[cur].symbol}</option>)}
+                </select>
+                <NumberInput label="Погашення через" value={b.months} suffix="міс" onChange={(months) => setBond(b.id, { months })} />
+                <input aria-label="Примітка" className="ladder__note" value={b.note} onChange={(e) => setBond(b.id, { note: e.target.value })} />
+                <button type="button" className="icon-btn" aria-label="Видалити облігацію" onClick={() => setReserve({ ladder: r.ladder.filter((x) => x.id !== b.id) })}>×</button>
+              </div>
+            ))}
+          </div>
+          <div className="rows__foot">
+            <button
+              type="button"
+              className="link-btn"
+              onClick={() => setReserve({ ladder: [...r.ladder, { id: uid(), qty: 1, price: 1000, currency: 'USD', months: 12, note: 'Після погашення купити нову на 12 міс' }] })}
+            >
+              + Додати облігацію
+            </button>
+            {r.ladder.length > 0 && <span className="rows__total">Разом: <b>{money(d.ladderTotal, c)}</b> <span className="muted">(орієнтовно)</span></span>}
+          </div>
+        </section>
       </div>
 
       <aside className="split__side">
@@ -79,3 +138,6 @@ export function Reserve({ plan, update, d, go }: SectionProps) {
     </div>
   )
 }
+
+const CASH_CURRENCIES: Currency[] = ['UAH', 'USD', 'EUR']
+const CASH_LABELS: Record<Currency, string> = { UAH: 'Гривні', USD: 'Долари', EUR: 'Євро' }

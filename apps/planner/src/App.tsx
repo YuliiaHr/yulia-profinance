@@ -2,7 +2,10 @@ import { useEffect, useMemo, useState } from 'react'
 import { CURRENCIES, type Currency } from './lib/format'
 import { Budget } from './sections/Budget'
 import { Freedom } from './sections/Freedom'
+import { Actions } from './sections/Actions'
+import { Assets } from './sections/Assets'
 import { Goals } from './sections/Goals'
+import { Portfolio } from './sections/Portfolio'
 import { Protection } from './sections/Protection'
 import { Reserve } from './sections/Reserve'
 import { Summary } from './sections/Summary'
@@ -10,13 +13,16 @@ import type { SectionProps, StepId } from './sections/types'
 import { derive } from './state/derive'
 import { usePlans } from './state/store'
 
-const STEPS: Array<{ id: StepId; n: string; title: string; Screen: (p: SectionProps) => JSX.Element }> = [
-  { id: 'budget', n: '1', title: 'Доходи і витрати', Screen: Budget },
-  { id: 'reserve', n: '2', title: 'Резервний фонд', Screen: Reserve },
-  { id: 'protection', n: '3', title: 'Захист', Screen: Protection },
-  { id: 'goals', n: '4', title: 'Цілі', Screen: Goals },
-  { id: 'freedom', n: '5', title: 'Фінансова свобода', Screen: Freedom },
-  { id: 'summary', n: '✓', title: 'Підсумок', Screen: Summary },
+const STEPS: Array<{ id: StepId; n: string; title: string; short: string; Screen: (p: SectionProps) => JSX.Element }> = [
+  { id: 'budget', n: '1', title: 'Доходи і витрати', short: 'Доходи', Screen: Budget },
+  { id: 'reserve', n: '2', title: 'Резервний фонд', short: 'Резерв', Screen: Reserve },
+  { id: 'protection', n: '3', title: 'Захист', short: 'Захист', Screen: Protection },
+  { id: 'goals', n: '4', title: 'Цілі', short: 'Цілі', Screen: Goals },
+  { id: 'assets', n: '5', title: 'Активи і розподіл на цілі', short: 'Активи', Screen: Assets },
+  { id: 'freedom', n: '6', title: 'Фінансова свобода', short: 'Свобода', Screen: Freedom },
+  { id: 'portfolio', n: '7', title: 'Інвестиційний портфель', short: 'Портфель', Screen: Portfolio },
+  { id: 'actions', n: '8', title: 'План дій', short: 'План дій', Screen: Actions },
+  { id: 'summary', n: '✓', title: 'Підсумок', short: 'Підсумок', Screen: Summary },
 ]
 
 const stepFromHash = (): StepId => {
@@ -90,7 +96,7 @@ export default function App() {
           {STEPS.map((s) => (
             <a key={s.id} href={`#${s.id}`} className="steps__item" aria-current={s.id === step ? 'step' : undefined} onClick={(e) => { e.preventDefault(); go(s.id) }}>
               <span className="steps__n">{s.n}</span>
-              <span className="steps__t">{s.title}</span>
+              <span className="steps__t">{s.short}</span>
             </a>
           ))}
         </nav>

@@ -1,0 +1,81 @@
+import { Field, Stat } from '../components/Field'
+import { NumberInput } from '../components/NumberInput'
+import { Term } from '../components/Term'
+import { CURRENCIES, money, percent } from '../lib/format'
+import type { ReserveSplit } from '../lib/reserve'
+import type { SectionProps } from './types'
+
+export function Reserve({ plan, update, d, go }: SectionProps) {
+  const c = plan.currency
+  const sym = CURRENCIES[c].symbol
+  const r = plan.reserve
+  const { reserve, totals } = d
+  const setSplit = (patch: Partial<ReserveSplit>) =>
+    update((p) => ({ ...p, reserve: { ...p.reserve, split: { ...p.reserve.split, ...patch } } }))
+  const setReserve = (patch: Partial<typeof r>) => update((p) => ({ ...p, reserve: { ...p.reserve, ...patch } }))
+  const shareOk = Math.abs(reserve.shareTotal - 1) < 0.001
+
+  return (
+    <div className="split">
+      <div className="split__main">
+        <p className="lead">
+          <Term k="reserve" /> захищає план від несподіванок. Рахуємо його від{' '}
+          <Term k="fixed">постійних витрат</Term>: зараз це {money(totals.fixed, c)} на місяць{' '}
+          <button type="button" className="link-btn" onClick={() => go('budget')}>(змінити)</button>.
+        </p>
+
+        <section className="group">
+          <h3>Розмір</h3>
+          <Field label="На скільки місяців" hint="Зазвичай 3–6. Якщо дохід нестабільний або ви єдиний годувальник — 6 і більше.">
+            <NumberInput label="Місяців" value={r.months} max={24} suffix="міс" onChange={(months) => setReserve({ months })} />
+          </Field>
+          <Field label="Вже відкладено">
+            <NumberInput label="Вже відкладено" value={r.saved} suffix={sym} onChange={(saved) => setReserve({ saved })} />
+          </Field>
+          <Field label="Зібрати до">
+            <input type="month" className="month" value={r.date} onChange={(e) => setReserve({ date: e.target.value })} />
+          </Field>
+        </section>
+
+        <section className="group">
+          <h3>Де тримати</h3>
+          <p className="small muted">
+            Гроші резервного фонду мають бути доступні швидко (висока <Term k="liquidity">ліквідність</Term>), тому
+            ділимо їх на три частини.
+          </p>
+          <Field label="Готівка" hint="Під рукою в перші дні. Краще в різних валютах: приблизно 20% гривні, 40% долари, 40% євро.">
+            <NumberInput label="Готівка, частка" percent value={r.split.cash} max={100} suffix="%" onChange={(cash) => setSplit({ cash })} />
+          </Field>
+          <Field label={<Term k="ovdp" />} hint="Гроші працюють і захищені від інфляції; продати можна за кілька днів.">
+            <NumberInput label="ОВДП, частка" percent value={r.split.bonds} max={100} suffix="%" onChange={(bonds) => setSplit({ bonds })} />
+          </Field>
+          <Field label={<><Term k="deposit">Депозит</Term>, рахунок, <Term k="stablecoin">стейблкоїни</Term></>}>
+            <NumberInput label="Депозити, частка" percent value={r.split.deposits} max={100} suffix="%" onChange={(deposits) => setSplit({ deposits })} />
+          </Field>
+          {!shareOk && <p className="warn">Частки в сумі дають {percent(reserve.shareTotal)}, а мають 100%.</p>}
+        </section>
+      </div>
+
+      <aside className="split__side">
+        <div className="card card--ink">
+          <Stat label="Резервний фонд" value={money(reserve.target, c)} note={`${r.months} міс × ${money(totals.fixed, c)}`} tone="accent" />
+          <ul className="list">
+            <li><span>Готівка</span><b>{money(reserve.parts.cash, c)}</b></li>
+            <li><span>ОВДП</span><b>{money(reserve.parts.bonds, c)}</b></li>
+            <li><span>Депозит, рахунок, стейблкоїни</span><b>{money(reserve.parts.deposits, c)}</b></li>
+          </ul>
+          <hr />
+          {d.reserveMonthly > 0 ? (
+            <Stat
+              label="Відкладати щомісяця"
+              value={money(d.reserveMonthly, c)}
+              note={d.reserveMonths > 0 ? `щоб зібрати ще ${money(reserve.target - r.saved, c)} за ${d.reserveMonths} міс` : 'дата вже минула — це вся сума, що лишилась'}
+            />
+          ) : (
+            <p className="good">Фонд уже зібрано ✓</p>
+          )}
+        </div>
+      </aside>
+    </div>
+  )
+}

@@ -8,6 +8,8 @@
 | `apps/planner/` | Фінансовий планер (Vite + React + TypeScript) | `/planner/` |
 | `packages/design-system/` | Дизайн-система бренду | не публікується |
 
+Важливі рішення записано в [docs/decisions.md](docs/decisions.md), правила розробки в [CLAUDE.md](CLAUDE.md).
+
 ## Робота локально
 
 Потрібен Node 22 (`nvm use`).

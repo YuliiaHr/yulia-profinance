@@ -26,7 +26,9 @@ function load(): Saved {
 
 function upgrade(p: Plan): Plan {
   const fresh = newPlan()
-  return { ...fresh, ...p, reserve: { ...fresh.reserve, ...p.reserve } }
+  // Plans in hryvnias are no longer supported: switch to dollars (rare, early test plans).
+  const currency = (p.currency as string) === 'UAH' ? 'USD' : p.currency
+  return { ...fresh, ...p, currency, reserve: { ...fresh.reserve, ...p.reserve } }
 }
 
 export function usePlans() {

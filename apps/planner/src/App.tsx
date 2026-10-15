@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CURRENCIES, type Currency } from './lib/format'
+import { CURRENCIES, PLAN_CURRENCIES, type PlanCurrency } from './lib/format'
 import { Budget } from './sections/Budget'
 import { Freedom } from './sections/Freedom'
 import { Actions } from './sections/Actions'
@@ -88,8 +88,8 @@ export default function App() {
           </div>
           <div className="plan-head__name">
             <label htmlFor="currency">Валюта плану</label>
-            <select id="currency" value={plan.currency} onChange={(e) => update((p) => ({ ...p, currency: e.target.value as Currency }))}>
-              {Object.entries(CURRENCIES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+            <select id="currency" value={plan.currency} onChange={(e) => update((p) => ({ ...p, currency: e.target.value as PlanCurrency }))}>
+              {PLAN_CURRENCIES.map((k) => <option key={k} value={k}>{CURRENCIES[k].label}</option>)}
             </select>
           </div>
           <button

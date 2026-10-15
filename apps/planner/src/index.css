@@ -150,18 +150,26 @@ h3 { font: 800 17px/1.25 var(--font-brand); letter-spacing: -.01em; margin-botto
 @media (max-width: 520px) { .plan-head input, .plan-head select { min-width: 0; width: 100%; } .plan-head__name { flex: 1 1 140px; } }
 
 .rows { display: grid; gap: 6px; }
-.rows__row { display: grid; grid-template-columns: minmax(0, 1fr) 150px 92px 32px; gap: 8px; align-items: center; }
+.rows__row { display: grid; grid-template-columns: minmax(0, 1fr) 190px 104px 32px; gap: 8px; align-items: center; }
+.amount { display: grid; grid-template-columns: minmax(0, 1fr) 54px; }
+.amount .num { border-radius: 8px 0 0 8px; border-right: 0; }
+.amount__cur {
+  min-height: 42px; border: 1.5px solid rgba(20, 20, 20, .25); border-radius: 0 8px 8px 0; padding: 0 18px 0 10px; appearance: none; font-weight: 600; cursor: pointer;
+  background: #EFE2CF url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='6'%3E%3Cpath d='M1 1l3.5 3.5L8 1' fill='none' stroke='%23141414' stroke-width='1.4'/%3E%3C/svg%3E") no-repeat right 7px center;
+}
+.amount:focus-within .num, .amount:focus-within .amount__cur { border-color: var(--ink); }
+.rows__conv { font-size: 13px; opacity: .65; text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .rows__name {
   min-height: 42px; padding: 0 12px; border-radius: 8px; border: 1.5px solid transparent; background: transparent; min-width: 0;
 }
 .rows__name:hover { border-color: rgba(20, 20, 20, .15); }
 .rows__name:focus { border-color: var(--ink); background: var(--field); outline: none; }
-.rows__year { font-size: 13px; opacity: .55; text-align: right; font-variant-numeric: tabular-nums; }
 .rows__foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-top: 6px; flex-wrap: wrap; }
 .rows__total b { font-variant-numeric: tabular-nums; }
 @media (max-width: 560px) {
-  .rows__row { grid-template-columns: minmax(0, 1fr) 128px 32px; }
-  .rows__year { display: none; }
+  .rows__row { grid-template-columns: minmax(0, 1fr) 150px 32px; row-gap: 2px; }
+  .rows__conv { grid-column: 2; grid-row: 2; font-size: 12px; }
+  .rows__row .icon-btn { grid-column: 3; grid-row: 1; }
 }
 
 /* ---------- terms (tooltips) ---------- */

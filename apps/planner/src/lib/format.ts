@@ -1,4 +1,7 @@
 export type Currency = 'USD' | 'EUR' | 'UAH'
+/** A plan is kept in dollars or euros; hryvnia amounts are converted. */
+export type PlanCurrency = Exclude<Currency, 'UAH'>
+export const PLAN_CURRENCIES: PlanCurrency[] = ['USD', 'EUR']
 
 export const CURRENCIES: Record<Currency, { symbol: string; label: string }> = {
   USD: { symbol: '$', label: 'Долари, $' },

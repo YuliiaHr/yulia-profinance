@@ -61,8 +61,8 @@ export function Protection({ plan, update, d }: SectionProps) {
     update((p) => ({
       ...p,
       fixed: insuranceRow
-        ? p.fixed.map((r) => (r.id === insuranceRow.id ? { ...r, amount: Math.round(monthly) } : r))
-        : [...p.fixed, { id: uid(), name: INSURANCE_ROW, amount: Math.round(monthly) }],
+        ? p.fixed.map((r) => (r.id === insuranceRow.id ? { ...r, amount: Math.round(monthly), currency: p.currency } : r))
+        : [...p.fixed, { id: uid(), name: INSURANCE_ROW, amount: Math.round(monthly), currency: p.currency }],
     }))
 
   return (
@@ -181,7 +181,7 @@ export function Protection({ plan, update, d }: SectionProps) {
                 <hr />
                 <Stat label="Разом" value={money(d.protectionYear, c)} note={`на рік · ${money(monthly, c)} на місяць`} tone="accent" />
                 {d.protectionYear > 0 && (
-                  insuranceRow && Math.round(insuranceRow.amount) === Math.round(monthly) ? (
+                  insuranceRow && Math.round(d.toPlan(insuranceRow.amount, insuranceRow.currency)) === Math.round(monthly) ? (
                     <p className="good small">✓ Враховано в постійних витратах</p>
                   ) : (
                     <button type="button" className="btn btn--sm" onClick={syncBudget}>

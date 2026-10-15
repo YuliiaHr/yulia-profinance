@@ -13,10 +13,7 @@ export function Assumptions({ plan, update, d, go }: SectionProps) {
   const f = plan.freedom
   const setF = (patch: Partial<FreedomSettings>) => update((p) => ({ ...p, freedom: { ...p.freedom, ...patch } }))
   const stale = daysSince(MARKET_AS_OF) > STALE_AFTER_DAYS
-  const inflationHint =
-    plan.currency === 'UAH'
-      ? 'Зараз інфляція в Україні 10%, НБУ прогнозує зниження до 5% у 2028 році. Для довгого плану розумно взяти значення між ними.'
-      : 'Для долара й євро в довгому плані зазвичай беруть 2–3% на рік.'
+  const inflationHint = 'Для долара й євро в довгому плані зазвичай беруть 2–3% на рік.'
 
   return (
     <div className="split">

@@ -46,6 +46,15 @@ describe('reserveFund', () => {
 })
 
 describe('budgetTotals', () => {
+  it('converts hryvnia rows into the plan currency', () => {
+    const toUsd = (amount: number, cur?: string) => (cur === 'UAH' ? amount / 40 : amount)
+    const t = budgetTotals(
+      { income: [{ id: 'a', name: '', amount: 80000, currency: 'UAH' }, { id: 'b', name: '', amount: 500 }], fixed: [], wants: [], charity: [] },
+      toUsd,
+    )
+    expect(t.income).toBe(2500)
+  })
+
   it('computes the savings window', () => {
     const row = (amount: number) => ({ id: String(amount), name: '', amount })
     const t = budgetTotals({ income: [row(1800)], fixed: [row(500), row(100)], wants: [row(300)], charity: [row(50)] })

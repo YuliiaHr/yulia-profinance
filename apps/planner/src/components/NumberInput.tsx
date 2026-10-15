@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import { parseNumber } from '../lib/format'
 
 interface Props {
@@ -17,6 +17,16 @@ interface Props {
 export function NumberInput({ value, onChange, suffix, percent, label, min = 0, max, placeholder }: Props) {
   const shown = percent ? round(value * 100, 2) : value
   const [text, setText] = useState<string | null>(null)
+  const input = useRef<HTMLInputElement>(null)
+  const selectOnRender = useRef(false)
+
+  // Select the whole value right after focus re-renders it, so typing replaces it.
+  useLayoutEffect(() => {
+    if (selectOnRender.current && input.current) {
+      selectOnRender.current = false
+      input.current.select()
+    }
+  })
 
   const commit = (t: string) => {
     const n = parseNumber(t)
@@ -28,13 +38,14 @@ export function NumberInput({ value, onChange, suffix, percent, label, min = 0, 
   return (
     <span className="num">
       <input
+        ref={input}
         aria-label={label}
         inputMode="decimal"
         placeholder={placeholder ?? '0'}
         value={text ?? (shown === 0 ? '' : display.format(shown))}
-        onFocus={(e) => {
+        onFocus={() => {
+          selectOnRender.current = true
           setText(shown === 0 ? '' : String(shown).replace('.', ','))
-          requestAnimationFrame(() => e.target.select())
         }}
         onChange={(e) => {
           setText(e.target.value)

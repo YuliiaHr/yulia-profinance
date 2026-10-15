@@ -1,7 +1,7 @@
 import { Stat } from '../components/Field'
 import { RowsEditor } from '../components/RowsEditor'
 import { Term } from '../components/Term'
-import { money, percent } from '../lib/format'
+import { CURRENCIES, money, percent } from '../lib/format'
 import type { SectionProps } from './types'
 
 export function Budget({ plan, update, d }: SectionProps) {
@@ -20,24 +20,25 @@ export function Budget({ plan, update, d }: SectionProps) {
       <div className="split__main">
         <p className="lead">
           Запишіть доходи й витрати за звичайний місяць. Суми — <Term k="netto">нетто</Term>, тобто ті, що реально
-          приходять на картку.
+          приходять на картку. Кожну суму можна вписати в гривнях (₴) або у валюті плану ({CURRENCIES[c].symbol}) —
+          гривні перераховуються за курсом {d.ratesInfo.fromNbu ? `НБУ на ${d.ratesInfo.date}` : 'з «Припущень»'}: 1 {CURRENCIES[c].symbol} = {d.rates[c].toLocaleString('uk-UA')} ₴.
         </p>
 
         <section className="group">
           <h3>Доходи</h3>
-          <RowsEditor rows={plan.income} onChange={(income) => update((p) => ({ ...p, income }))} currency={c} addLabel="Додати дохід" total="Усього доходів" />
+          <RowsEditor rows={plan.income} onChange={(income) => update((p) => ({ ...p, income }))} currency={c} toPlan={d.toPlan} addLabel="Додати дохід" total="Усього доходів" />
         </section>
         <section className="group">
           <h3><Term k="fixed" /></h3>
-          <RowsEditor rows={plan.fixed} onChange={(fixed) => update((p) => ({ ...p, fixed }))} currency={c} addLabel="Додати витрату" total="Разом" />
+          <RowsEditor rows={plan.fixed} onChange={(fixed) => update((p) => ({ ...p, fixed }))} currency={c} toPlan={d.toPlan} addLabel="Додати витрату" total="Разом" />
         </section>
         <section className="group">
           <h3><Term k="wants" /></h3>
-          <RowsEditor rows={plan.wants} onChange={(wants) => update((p) => ({ ...p, wants }))} currency={c} addLabel="Додати витрату" total="Разом" />
+          <RowsEditor rows={plan.wants} onChange={(wants) => update((p) => ({ ...p, wants }))} currency={c} toPlan={d.toPlan} addLabel="Додати витрату" total="Разом" />
         </section>
         <section className="group">
           <h3>Благодійність</h3>
-          <RowsEditor rows={plan.charity} onChange={(charity) => update((p) => ({ ...p, charity }))} currency={c} addLabel="Додати" />
+          <RowsEditor rows={plan.charity} onChange={(charity) => update((p) => ({ ...p, charity }))} currency={c} toPlan={d.toPlan} addLabel="Додати" />
         </section>
       </div>
 

@@ -1,9 +1,16 @@
+import type { Currency } from './format'
+
 export interface Row {
   id: string
   name: string
-  /** Monthly amount, net (after taxes). */
+  /** Monthly amount, net (after taxes), in `currency`. */
   amount: number
+  /** Currency the amount was typed in; missing = plan currency. */
+  currency?: Currency
 }
+
+/** Converts a row amount into the plan currency. */
+export type ToPlan = (amount: number, currency?: Currency) => number
 
 export interface Budget {
   income: Row[]
@@ -22,13 +29,16 @@ export interface BudgetTotals {
   savings: number
 }
 
-export const sumRows = (rows: Row[]): number => rows.reduce((s, r) => s + (r.amount || 0), 0)
+const same: ToPlan = (amount) => amount
 
-export function budgetTotals(b: Budget): BudgetTotals {
-  const income = sumRows(b.income)
-  const fixed = sumRows(b.fixed)
-  const wants = sumRows(b.wants)
-  const charity = sumRows(b.charity)
+export const sumRows = (rows: Row[], toPlan: ToPlan = same): number =>
+  rows.reduce((s, r) => s + toPlan(r.amount || 0, r.currency), 0)
+
+export function budgetTotals(b: Budget, toPlan: ToPlan = same): BudgetTotals {
+  const income = sumRows(b.income, toPlan)
+  const fixed = sumRows(b.fixed, toPlan)
+  const wants = sumRows(b.wants, toPlan)
+  const charity = sumRows(b.charity, toPlan)
   const expenses = fixed + wants + charity
   return { income, fixed, wants, charity, expenses, savings: income - expenses }
 }

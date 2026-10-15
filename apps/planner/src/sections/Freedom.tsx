@@ -59,7 +59,7 @@ export function Freedom({ plan, update, d, go }: SectionProps) {
             <Field label={<><Term k="returnRate">Дохідність</Term> інвестицій</>} hint={<>Для помірно-консервативного <Term k="riskProfile">ризик-профілю</Term> у доларах — близько 6%.</>}>
               <NumberInput label="Дохідність" percent value={f.returnRate} max={50} suffix="% на рік" onChange={(returnRate) => set({ returnRate })} />
             </Field>
-            <Field label={<Term k="inflation" />} hint={c === 'UAH' ? 'Для гривні інфляція й дохідність значно вищі, ніж для долара — уточніть обидві цифри.' : undefined}>
+            <Field label={<Term k="inflation" />}>
               <NumberInput label="Інфляція" percent value={f.inflation} max={50} suffix="% на рік" onChange={(inflation) => set({ inflation })} />
             </Field>
             <Field label={<Term k="incomeGrowth" />}>

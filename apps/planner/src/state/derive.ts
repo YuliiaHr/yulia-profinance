@@ -4,6 +4,7 @@ import { monthlyForGoal, monthsUntil } from '../lib/goals'
 import { reserveFund } from '../lib/reserve'
 import { convert, splitCash, type Rates } from '../lib/fx'
 import type { NbuRates } from '../lib/nbu'
+import type { Currency } from '../lib/format'
 import type { Plan } from './plan'
 
 export interface AllocationLine {
@@ -30,8 +31,9 @@ export function derive(plan: Plan, nbu: NbuRates | null = null, today = new Date
   const useNbu = plan.ratesSource === 'nbu' && nbu !== null
   const rates: Rates = useNbu ? { UAH: 1, USD: nbu.USD, EUR: nbu.EUR } : plan.rates
   const ratesInfo = { fromNbu: useNbu, date: useNbu ? nbu.date : '' }
+  const toPlan = (amount: number, cur: Currency = plan.currency) => convert(amount, cur, plan.currency, rates)
+  const totals = budgetTotals(plan, toPlan)
 
-  const totals = budgetTotals(plan)
   const reserve = reserveFund(totals.fixed, plan.reserve.months, plan.reserve.split)
   const reserveMonths = monthsUntil(plan.reserve.date, today)
   const reserveMonthly = monthlyForGoal(reserve.target, plan.reserve.saved, reserveMonths)
@@ -66,7 +68,6 @@ export function derive(plan: Plan, nbu: NbuRates | null = null, today = new Date
   const goalsMonthly = goals.reduce((s, g) => s + g.monthly, 0)
 
   // Assets earmarked for each target, in the plan currency.
-  const toPlan = (amount: number, cur: typeof plan.currency) => convert(amount, cur, plan.currency, rates)
   const assetsTotal = plan.assets.reduce((sum, a) => sum + toPlan(a.amount, a.currency), 0)
   const allocated = (target: string) =>
     plan.assets.filter((a) => a.target === target).reduce((sum, a) => sum + toPlan(a.amount, a.currency), 0)
@@ -83,7 +84,7 @@ export function derive(plan: Plan, nbu: NbuRates | null = null, today = new Date
 
   const protectionYear = plan.protection.reduce((sum, x) => sum + x.price, 0)
 
-  return { rates, ratesInfo, assetsTotal, allocation, unallocated, cashByCurrency, ladderTotal, protectionYear, totals, reserve, reserveMonths, reserveMonthly, freedomInput, freedom, goals, goalsMonthly }
+  return { toPlan, rates, ratesInfo, assetsTotal, allocation, unallocated, cashByCurrency, ladderTotal, protectionYear, totals, reserve, reserveMonths, reserveMonthly, freedomInput, freedom, goals, goalsMonthly }
 }
 
 export type Derived = ReturnType<typeof derive>

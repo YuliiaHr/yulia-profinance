@@ -1,5 +1,5 @@
 import type { Row } from '../lib/budget'
-import type { Currency } from '../lib/format'
+import type { Currency, PlanCurrency } from '../lib/format'
 import type { ReserveSplit } from '../lib/reserve'
 import { DEFAULT_RATES, type Rates } from '../lib/fx'
 import { BOND_LADDER, INSTRUMENTS, TASKS, type TaskStage, type TaskStatus } from '../data/templates'
@@ -87,7 +87,7 @@ export interface Plan {
   id: string
   client: string
   updatedAt: number
-  currency: Currency
+  currency: PlanCurrency
   income: Row[]
   fixed: Row[]
   wants: Row[]
@@ -115,7 +115,8 @@ export interface Plan {
 
 export const uid = () => Math.random().toString(36).slice(2, 10)
 
-const row = (name: string, amount = 0): Row => ({ id: uid(), name, amount })
+/** Template rows are in hryvnias: most clients count their budget in UAH. */
+const row = (name: string, amount = 0, currency: Currency = 'UAH'): Row => ({ id: uid(), name, amount, currency })
 
 function monthFromNow(months: number): string {
   const d = new Date()
@@ -156,12 +157,19 @@ export function newPlan(client = 'Новий клієнт'): Plan {
 /** Filled-in example shown on first visit, so it's clear how the planner works. */
 export function examplePlan(): Plan {
   const p = newPlan('Приклад')
-  const amounts: Record<string, number> = {
-    Зарплата: 2000, Житло: 450, Продукти: 320, Комунальні: 80, 'Здоров’я': 70, Транспорт: 40,
-    Кафе: 60, Одяг: 120, Краса: 80, Подорожі: 200, Підписки: 25, 'Розваги, інше': 70, Благодійність: 40,
+  // Salary and rent in dollars, everyday spending in hryvnias — a typical mix.
+  const amounts: Record<string, [number, Currency]> = {
+    Зарплата: [2000, 'USD'], Житло: [450, 'USD'], Продукти: [14000, 'UAH'], Комунальні: [3500, 'UAH'],
+    'Здоров’я': [3000, 'UAH'], Транспорт: [1800, 'UAH'], Кафе: [2600, 'UAH'], Одяг: [5000, 'UAH'],
+    Краса: [3500, 'UAH'], Подорожі: [200, 'USD'], Підписки: [1000, 'UAH'], 'Розваги, інше': [3000, 'UAH'],
+    Благодійність: [1700, 'UAH'],
   }
   for (const list of [p.income, p.fixed, p.wants, p.charity]) {
-    for (const r of list) r.amount = amounts[r.name] ?? 0
+    for (const r of list) {
+      const [amount, currency] = amounts[r.name] ?? [0, 'UAH']
+      r.amount = amount
+      r.currency = currency
+    }
   }
   p.reserve.saved = 1500
   p.reserve.ladder = BOND_LADDER.map((b) => ({ ...b, id: uid() }))

@@ -69,7 +69,7 @@ export function Goals({ plan, update, d, go }: SectionProps) {
         <button type="button" className="link-btn" onClick={addGoal}>+ Додати ціль</button>
         <p className="small muted">
           Сума на місяць = (вартість − вже є) ÷ місяців до дати, без урахування відсотків. Для фінансової свободи — сума
-          з кроку 4.
+          з кроку 5.
         </p>
       </div>
 

@@ -14,7 +14,8 @@ function load(): Saved {
     const raw = localStorage.getItem(KEY)
     if (raw) {
       const s = JSON.parse(raw) as Saved
-      if (s.plans?.length) return s
+      // Plans saved by older versions miss newer fields.
+      if (s.plans?.length) return { ...s, plans: s.plans.map((p) => ({ ...newPlan(), ...p })) }
     }
   } catch {
     // storage blocked or corrupted — start fresh

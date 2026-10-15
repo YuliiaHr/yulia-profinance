@@ -26,6 +26,13 @@ export interface FreedomSettings {
   pension: number | null
 }
 
+export interface ChosenInsurance {
+  /** Program id from data/insurance.ts */
+  id: string
+  /** Yearly price in the plan currency, typed by the advisor. */
+  price: number
+}
+
 export interface Plan {
   id: string
   client: string
@@ -37,6 +44,7 @@ export interface Plan {
   charity: Row[]
   reserve: { months: number; split: ReserveSplit; saved: number; date: string }
   goals: Goal[]
+  protection: ChosenInsurance[]
   freedom: FreedomSettings
 }
 
@@ -63,6 +71,7 @@ export function newPlan(client = 'Новий клієнт'): Plan {
     charity: [row('Благодійність')],
     reserve: { months: 6, split: { cash: 0.4, bonds: 0.4, deposits: 0.2 }, saved: 0, date: monthFromNow(12) },
     goals: [],
+    protection: [],
     freedom: {
       age: 30, retireAge: 60, lifeAge: 85, saveRate: 0.1, capital: 0,
       returnRate: 0.06, incomeGrowth: 0, inflation: 0.02, income: null, pension: null,

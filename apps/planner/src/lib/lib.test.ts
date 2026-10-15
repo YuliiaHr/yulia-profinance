@@ -4,6 +4,7 @@ import { reserveFund } from './reserve'
 import { monthlyForGoal, monthsUntil } from './goals'
 import { simulateFreedom, type FreedomInput } from './freedom'
 import { parseNumber } from './format'
+import { CATEGORIES, PROGRAMS } from '../data/insurance'
 
 // Reference numbers come from the advisor's spreadsheet (sheets "Розрахунок пенсії" / "Модель").
 const base: FreedomInput = {
@@ -72,5 +73,23 @@ describe('parseNumber', () => {
     expect(parseNumber('1 800,5')).toBe(1800.5)
     expect(parseNumber('')).toBe(0)
     expect(parseNumber('abc')).toBeNull()
+  })
+})
+
+describe('insurance data', () => {
+  it('uses only known categories and row keys, with unique ids', () => {
+    const ids = new Set<string>()
+    for (const p of PROGRAMS) {
+      const cat = CATEGORIES.find((c) => c.id === p.category)
+      expect(cat, p.id).toBeDefined()
+      const keys = new Set(cat!.rows.map((r) => r.key))
+      for (const k of Object.keys(p.facts)) expect(keys.has(k), `${p.id}.${k}`).toBe(true)
+      expect(ids.has(p.id), p.id).toBe(false)
+      ids.add(p.id)
+    }
+  })
+  it('has no Russian-only letters left', () => {
+    const text = JSON.stringify([CATEGORIES, PROGRAMS.map((p) => [p.name, p.facts])])
+    expect(text).not.toMatch(/[ыэъё]/i)
   })
 })

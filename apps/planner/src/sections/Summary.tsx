@@ -1,4 +1,5 @@
 import { money, percent, type Currency } from '../lib/format'
+import { PROGRAMS } from '../data/insurance'
 import { formatMonth } from './Goals'
 import type { SectionProps } from './types'
 
@@ -46,7 +47,29 @@ export function Summary({ plan, d }: SectionProps) {
       </section>
 
       <section className="summary__block">
-        <h3>3. Цілі</h3>
+        <h3>3. Захист</h3>
+        {plan.protection.length === 0 ? (
+          <p className="muted">Програми страхування не обрано.</p>
+        ) : (
+          <div className="table-wrap">
+            <table className="table">
+              <thead><tr><th>Програма</th><th>На рік</th></tr></thead>
+              <tbody>
+                {plan.protection.map((x) => {
+                  const p = PROGRAMS.find((pr) => pr.id === x.id)
+                  return p ? <tr key={x.id}><td>{p.company} · {p.name}</td><td>{money(x.price, c)}</td></tr> : null
+                })}
+              </tbody>
+              <tfoot>
+                <tr><th>Разом</th><th>{money(d.protectionYear, c)} <span className="muted">({money(d.protectionYear / 12, c)} на місяць)</span></th></tr>
+              </tfoot>
+            </table>
+          </div>
+        )}
+      </section>
+
+      <section className="summary__block">
+        <h3>4. Цілі</h3>
         <div className="table-wrap">
         <table className="table">
           <thead><tr><th>Ціль</th><th>Вартість</th><th>Коли</th><th>На місяць</th></tr></thead>
@@ -69,7 +92,7 @@ export function Summary({ plan, d }: SectionProps) {
       </section>
 
       <section className="summary__block">
-        <h3>4. Фінансова свобода</h3>
+        <h3>5. Фінансова свобода</h3>
         <dl className="kv">
           <dt>Відкладати</dt><dd>{money(r.monthlySaving, c)} <span className="muted">({percent(f.saveRate)} доходу) до {f.retireAge} років</span></dd>
           <dt>Капітал у {f.retireAge} років</dt><dd>{money(r.capitalAtRetirementReal, c)} <span className="muted">у сьогоднішніх цінах</span></dd>

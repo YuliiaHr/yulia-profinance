@@ -51,7 +51,9 @@ export function derive(plan: Plan, today = new Date()) {
   ]
   const goalsMonthly = goals.reduce((s, g) => s + g.monthly, 0)
 
-  return { totals, reserve, reserveMonths, reserveMonthly, freedomInput, freedom, goals, goalsMonthly }
+  const protectionYear = plan.protection.reduce((sum, x) => sum + x.price, 0)
+
+  return { protectionYear, totals, reserve, reserveMonths, reserveMonthly, freedomInput, freedom, goals, goalsMonthly }
 }
 
 export type Derived = ReturnType<typeof derive>

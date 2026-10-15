@@ -3,6 +3,7 @@ import { CURRENCIES, type Currency } from './lib/format'
 import { Budget } from './sections/Budget'
 import { Freedom } from './sections/Freedom'
 import { Goals } from './sections/Goals'
+import { Protection } from './sections/Protection'
 import { Reserve } from './sections/Reserve'
 import { Summary } from './sections/Summary'
 import type { SectionProps, StepId } from './sections/types'
@@ -12,8 +13,9 @@ import { usePlans } from './state/store'
 const STEPS: Array<{ id: StepId; n: string; title: string; Screen: (p: SectionProps) => JSX.Element }> = [
   { id: 'budget', n: '1', title: 'Доходи і витрати', Screen: Budget },
   { id: 'reserve', n: '2', title: 'Резервний фонд', Screen: Reserve },
-  { id: 'goals', n: '3', title: 'Цілі', Screen: Goals },
-  { id: 'freedom', n: '4', title: 'Фінансова свобода', Screen: Freedom },
+  { id: 'protection', n: '3', title: 'Захист', Screen: Protection },
+  { id: 'goals', n: '4', title: 'Цілі', Screen: Goals },
+  { id: 'freedom', n: '5', title: 'Фінансова свобода', Screen: Freedom },
   { id: 'summary', n: '✓', title: 'Підсумок', Screen: Summary },
 ]
 

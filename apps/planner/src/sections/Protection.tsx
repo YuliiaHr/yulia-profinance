@@ -25,7 +25,8 @@ export function Protection({ plan, update, d }: SectionProps) {
 
   const cat = CATEGORIES.find((x) => x.id === catId)!
   const all = PROGRAMS.filter((p) => p.category === catId)
-  const list = useMemo(
+  // Programs matching coverage and location; the age check is applied on top.
+  const matching = useMemo(
     () =>
       all.filter((p) => {
         if (catId !== 'critical') return true
@@ -33,11 +34,13 @@ export function Protection({ plan, update, d }: SectionProps) {
         // 'ua' = treatment only in Ukraine; 'abroad' = treatment abroad is possible.
         if (where === 'ua' && p.where?.includes('abroad')) return false
         if (where === 'abroad' && !p.where?.includes('abroad')) return false
-        if (fitsAge && p.maxEntryAge !== undefined && age > p.maxEntryAge) return false
         return true
       }),
-    [all, catId, covers, where, fitsAge, age],
+    [all, catId, covers, where],
   )
+  const tooOld = (p: Program) => p.maxEntryAge !== undefined && age > p.maxEntryAge
+  const hiddenByAge = catId === 'critical' ? matching.filter(tooOld).length : 0
+  const list = fitsAge ? matching.filter((p) => !(catId === 'critical' && tooOld(p))) : matching
   const chosen = plan.protection
   const isChosen = (id: string) => chosen.some((x) => x.id === id)
   const compared = compare.map((id) => PROGRAMS.find((p) => p.id === id)!).filter(Boolean)
@@ -120,13 +123,36 @@ export function Protection({ plan, update, d }: SectionProps) {
                   </label>
                 ))}
               </div>
-              <label className="check">
-                <input type="checkbox" checked={fitsAge} onChange={(e) => setFitsAge(e.target.checked)} />
-                Лише ті, що можна оформити у {age} {age % 10 === 1 && age % 100 !== 11 ? 'рік' : 'років'}
-              </label>
+              <div className="filters__group">
+                <span className="filters__label">Вік клієнта</span>
+                <span className="filters__age">
+                  <NumberInput
+                    label="Вік клієнта"
+                    value={age}
+                    max={100}
+                    suffix={yearsWord(age)}
+                    onChange={(v) => update((p) => ({ ...p, freedom: { ...p.freedom, age: v } }))}
+                  />
+                </span>
+                <span className="small">
+                  {hiddenByAge === 0 ? (
+                    <>✓ У {age} {yearsWord(age)} можна оформити всі ці програми</>
+                  ) : fitsAge ? (
+                    <>
+                      Сховано {hiddenByAge} {programsWord(hiddenByAge)}: {hiddenByAge === 1 ? 'її' : 'їх'} не оформлюють у {age} {yearsWord(age)} ·{' '}
+                      <button type="button" className="link-btn" onClick={() => setFitsAge(false)}>показати</button>
+                    </>
+                  ) : (
+                    <>
+                      {hiddenByAge} {programsWord(hiddenByAge)} не за віком — позначено на картках ·{' '}
+                      <button type="button" className="link-btn" onClick={() => setFitsAge(true)}>сховати</button>
+                    </>
+                  )}
+                </span>
+              </div>
               <p className="filters__count" aria-live="polite">
                 Показано {list.length} з {all.length}
-                {list.length < all.length && (
+                {(covers.length > 0 || where !== 'any') && (
                   <>
                     {' · '}
                     <button
@@ -135,7 +161,6 @@ export function Protection({ plan, update, d }: SectionProps) {
                       onClick={() => {
                         setCovers([])
                         setWhere('any')
-                        setFitsAge(false)
                       }}
                     >
                       скинути фільтри
@@ -155,6 +180,7 @@ export function Protection({ plan, update, d }: SectionProps) {
               {list.map((p) => (
                 <ProgramCard
                   key={p.id}
+                  ageWarning={catId === 'critical' && tooOld(p) ? `Не оформлюють у ${age} ${yearsWord(age)}` : undefined}
                   p={p}
                   cat={cat}
                   open={open === p.id}
@@ -224,6 +250,7 @@ function FactLabel({ row }: { row: Category['rows'][number] }) {
 }
 
 interface CardProps {
+  ageWarning?: string
   p: Program
   cat: Category
   open: boolean
@@ -235,13 +262,14 @@ interface CardProps {
   onChoose: () => void
 }
 
-function ProgramCard({ p, cat, open, onToggleOpen, compared, compareFull, onCompare, chosen, onChoose }: CardProps) {
+function ProgramCard({ ageWarning, p, cat, open, onToggleOpen, compared, compareFull, onCompare, chosen, onChoose }: CardProps) {
   const keyRows = cat.rows.filter((r) => cat.keyRows.includes(r.key) && p.facts[r.key])
   const restRows = cat.rows.filter((r) => !cat.keyRows.includes(r.key) && p.facts[r.key])
   return (
     <article className={`pcard${chosen ? ' pcard--chosen' : ''}`}>
       <p className="pcard__company">{p.company}</p>
       <h3 className="pcard__name">{p.name}</h3>
+      {ageWarning && <p className="pcard__warn">{ageWarning}</p>}
       {p.covers && (
         <ul className="tags">
           {p.covers.map((cv) => <li key={cv}>{COVER_LABELS[cv]}</li>)}
@@ -323,4 +351,19 @@ function Compare({ cat, programs, onClose }: { cat: Category; programs: Program[
       </div>
     </section>
   )
+}
+
+/** 1 рік, 2 роки, 5 років, 11 років, 21 рік… */
+export function yearsWord(n: number): string {
+  const d = n % 10
+  const dd = n % 100
+  if (d === 1 && dd !== 11) return 'рік'
+  if (d >= 2 && d <= 4 && (dd < 12 || dd > 14)) return 'роки'
+  return 'років'
+}
+
+/** 1 програму, 2 програми, 5 програм */
+function programsWord(n: number): string {
+  const w = yearsWord(n)
+  return w === 'рік' ? 'програму' : w === 'роки' ? 'програми' : 'програм'
 }

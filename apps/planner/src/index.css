@@ -342,6 +342,7 @@ input.goals__name:focus { border-color: var(--ink); background: var(--field); ou
 }
 
 /* ---------- assets ---------- */
+.rates-block { display: grid; gap: 8px; }
 .rates { display: flex; flex-wrap: wrap; gap: 12px 24px; }
 .rates__item { display: flex; align-items: center; gap: 10px; font-weight: 600; }
 .rates__item .num { width: 150px; }

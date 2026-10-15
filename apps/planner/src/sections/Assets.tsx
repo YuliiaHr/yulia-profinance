@@ -1,5 +1,6 @@
 import { Stat } from '../components/Field'
 import { NumberInput } from '../components/NumberInput'
+import { RatesFields } from '../components/RatesFields'
 import { Term } from '../components/Term'
 import { CURRENCIES, money, type Currency } from '../lib/format'
 import { uid, type Asset } from '../state/plan'
@@ -45,14 +46,7 @@ export function Assets({ plan, update, d, go }: SectionProps) {
 
         <section className="group">
           <h3><Term k="rates">Курси валют</Term></h3>
-          <div className="rates">
-            {(['USD', 'EUR'] as Currency[]).map((cur) => (
-              <label key={cur} className="rates__item">
-                <span>1 {CURRENCIES[cur].symbol} =</span>
-                <NumberInput label={`Курс ${cur}`} value={plan.rates[cur]} suffix="₴" onChange={(v) => update((p) => ({ ...p, rates: { ...p.rates, [cur]: v || 1 } }))} />
-              </label>
-            ))}
-          </div>
+          <RatesFields plan={plan} update={update} d={d} />
         </section>
 
         <section className="group">

@@ -164,7 +164,7 @@ export function Summary({ plan, d }: SectionProps) {
           <dt>Інфляція ({c})</dt><dd>{percent(f.inflation)} на рік</dd>
           <dt>Дохідність інвестицій (до податків)</dt><dd>{percent(f.returnRate)} на рік</dd>
           <dt>Ріст доходу</dt><dd>{percent(f.incomeGrowth)} на рік</dd>
-          <dt>Курси</dt><dd>1 $ = {plan.rates.USD.toLocaleString('uk-UA')} ₴ · 1 € = {plan.rates.EUR.toLocaleString('uk-UA')} ₴</dd>
+          <dt>Курси{d.ratesInfo.fromNbu ? ` (НБУ на ${d.ratesInfo.date})` : ''}</dt><dd>1 $ = {d.rates.USD.toLocaleString('uk-UA')} ₴ · 1 € = {d.rates.EUR.toLocaleString('uk-UA')} ₴</dd>
         </dl>
         <p className="small muted">Ринкові дані для довідки — станом на {formatDate(MARKET_AS_OF)}.</p>
       </section>

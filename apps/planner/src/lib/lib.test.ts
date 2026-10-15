@@ -140,3 +140,25 @@ describe('market assumptions', () => {
     for (const m of MARKET) expect(Boolean(m.source) || m.unverified, m.label).toBe(true)
   })
 })
+
+import { parseNbu } from './nbu'
+import { derive } from '../state/derive'
+import { newPlan } from '../state/plan'
+
+describe('NBU rates', () => {
+  const sample = [
+    { r030: 840, txt: 'Долар США', rate: 44.9801, cc: 'USD', exchangedate: '15.10.2026' },
+    { r030: 978, txt: 'Євро', rate: 52.1, cc: 'EUR', exchangedate: '15.10.2026' },
+  ]
+  it('parses the NBU response', () => {
+    expect(parseNbu(sample)).toEqual({ USD: 44.9801, EUR: 52.1, date: '15.10.2026' })
+    expect(parseNbu({ error: 1 })).toBeNull()
+  })
+  it('uses NBU rates unless the plan has manual rates', () => {
+    const nbu = parseNbu(sample)
+    const p = newPlan()
+    expect(derive(p, nbu).rates.USD).toBe(44.9801)
+    expect(derive({ ...p, ratesSource: 'manual' }, nbu).rates.USD).toBe(p.rates.USD)
+    expect(derive(p, null).rates.USD).toBe(p.rates.USD)
+  })
+})

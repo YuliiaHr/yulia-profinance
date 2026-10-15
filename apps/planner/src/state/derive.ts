@@ -2,7 +2,8 @@ import { budgetTotals } from '../lib/budget'
 import { simulateFreedom, type FreedomInput } from '../lib/freedom'
 import { monthlyForGoal, monthsUntil } from '../lib/goals'
 import { reserveFund } from '../lib/reserve'
-import { convert, splitCash } from '../lib/fx'
+import { convert, splitCash, type Rates } from '../lib/fx'
+import type { NbuRates } from '../lib/nbu'
 import type { Plan } from './plan'
 
 export interface AllocationLine {
@@ -25,7 +26,11 @@ export interface GoalLine {
 }
 
 /** All numbers the screens show, computed from the plan in one place. */
-export function derive(plan: Plan, today = new Date()) {
+export function derive(plan: Plan, nbu: NbuRates | null = null, today = new Date()) {
+  const useNbu = plan.ratesSource === 'nbu' && nbu !== null
+  const rates: Rates = useNbu ? { UAH: 1, USD: nbu.USD, EUR: nbu.EUR } : plan.rates
+  const ratesInfo = { fromNbu: useNbu, date: useNbu ? nbu.date : '' }
+
   const totals = budgetTotals(plan)
   const reserve = reserveFund(totals.fixed, plan.reserve.months, plan.reserve.split)
   const reserveMonths = monthsUntil(plan.reserve.date, today)
@@ -61,7 +66,7 @@ export function derive(plan: Plan, today = new Date()) {
   const goalsMonthly = goals.reduce((s, g) => s + g.monthly, 0)
 
   // Assets earmarked for each target, in the plan currency.
-  const toPlan = (amount: number, cur: typeof plan.currency) => convert(amount, cur, plan.currency, plan.rates)
+  const toPlan = (amount: number, cur: typeof plan.currency) => convert(amount, cur, plan.currency, rates)
   const assetsTotal = plan.assets.reduce((sum, a) => sum + toPlan(a.amount, a.currency), 0)
   const allocated = (target: string) =>
     plan.assets.filter((a) => a.target === target).reduce((sum, a) => sum + toPlan(a.amount, a.currency), 0)
@@ -73,12 +78,12 @@ export function derive(plan: Plan, today = new Date()) {
     { target: 'freedom', name: 'Фінансова свобода', need: null, have: allocated('freedom') },
   ]
   const unallocated = allocated('')
-  const cashByCurrency = splitCash(reserve.parts.cash, plan.currency, plan.reserve.cashSplit, plan.rates)
+  const cashByCurrency = splitCash(reserve.parts.cash, plan.currency, plan.reserve.cashSplit, rates)
   const ladderTotal = plan.reserve.ladder.reduce((sum, b) => sum + toPlan(b.qty * b.price, b.currency), 0)
 
   const protectionYear = plan.protection.reduce((sum, x) => sum + x.price, 0)
 
-  return { assetsTotal, allocation, unallocated, cashByCurrency, ladderTotal, protectionYear, totals, reserve, reserveMonths, reserveMonthly, freedomInput, freedom, goals, goalsMonthly }
+  return { rates, ratesInfo, assetsTotal, allocation, unallocated, cashByCurrency, ladderTotal, protectionYear, totals, reserve, reserveMonths, reserveMonthly, freedomInput, freedom, goals, goalsMonthly }
 }
 
 export type Derived = ReturnType<typeof derive>

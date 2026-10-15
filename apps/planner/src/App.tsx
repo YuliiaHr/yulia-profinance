@@ -13,6 +13,7 @@ import { Summary } from './sections/Summary'
 import type { SectionProps, StepId } from './sections/types'
 import { derive } from './state/derive'
 import { usePlans } from './state/store'
+import { useNbuRates } from './lib/nbu'
 
 const STEPS: Array<{ id: StepId; n: string; title: string; short: string; Screen: (p: SectionProps) => JSX.Element }> = [
   { id: 'budget', n: '1', title: 'Доходи і витрати', short: 'Доходи', Screen: Budget },
@@ -40,7 +41,8 @@ const stepFromHash = (): StepId => {
 export default function App() {
   const { plans, plan, update, select, create, remove } = usePlans()
   const [step, setStep] = useState<StepId>(stepFromHash)
-  const d = useMemo(() => derive(plan), [plan])
+  const nbu = useNbuRates()
+  const d = useMemo(() => derive(plan, nbu), [plan, nbu])
 
   useEffect(() => {
     const onHash = () => setStep(stepFromHash())

@@ -2,13 +2,14 @@ import { Field } from '../components/Field'
 import { NumberInput } from '../components/NumberInput'
 import { Term } from '../components/Term'
 import { MARKET, MARKET_AS_OF, STALE_AFTER_DAYS, daysSince } from '../data/assumptions'
-import { CURRENCIES, type Currency } from '../lib/format'
+import { CURRENCIES } from '../lib/format'
+import { RatesFields } from '../components/RatesFields'
 import type { FreedomSettings } from '../state/plan'
 import type { SectionProps } from './types'
 
 export const formatDate = (iso: string) => new Date(iso).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' })
 
-export function Assumptions({ plan, update, go }: SectionProps) {
+export function Assumptions({ plan, update, d, go }: SectionProps) {
   const f = plan.freedom
   const setF = (patch: Partial<FreedomSettings>) => update((p) => ({ ...p, freedom: { ...p.freedom, ...patch } }))
   const stale = daysSince(MARKET_AS_OF) > STALE_AFTER_DAYS
@@ -39,11 +40,10 @@ export function Assumptions({ plan, update, go }: SectionProps) {
           <Field label={<Term k="incomeGrowth" />}>
             <NumberInput label="Ріст доходу" percent value={f.incomeGrowth} max={50} suffix="% на рік" onChange={(incomeGrowth) => setF({ incomeGrowth })} />
           </Field>
-          {(['USD', 'EUR'] as Currency[]).map((cur) => (
-            <Field key={cur} label={<><Term k="rates">Курс</Term> {CURRENCIES[cur].symbol}</>} hint={cur === 'USD' ? 'Для перерахунку активів і готівки в різних валютах.' : undefined}>
-              <NumberInput label={`Курс ${cur}`} value={plan.rates[cur]} suffix="₴" onChange={(v) => update((p) => ({ ...p, rates: { ...p.rates, [cur]: v || 1 } }))} />
-            </Field>
-          ))}
+          <Field label={<><Term k="rates">Курси валют</Term></>} hint="Для перерахунку активів і готівки в різних валютах.">
+            <span />
+          </Field>
+          <RatesFields plan={plan} update={update} d={d} />
           <p className="small muted">
             Де використовується: інфляція, дохідність і ріст доходу — на кроці{' '}
             <button type="button" className="link-btn" onClick={() => go('freedom')}>«Свобода»</button>; курси — на кроках{' '}

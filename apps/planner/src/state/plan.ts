@@ -101,7 +101,9 @@ export interface Plan {
     cashSplit: Record<Currency, number>
     ladder: Bond[]
   }
+  /** Manual rates; used when ratesSource is 'manual' or the NBU is unreachable. */
   rates: Rates
+  ratesSource: 'nbu' | 'manual'
   assets: Asset[]
   portfolio: Instrument[]
   rebalanceDeposit: number
@@ -137,6 +139,7 @@ export function newPlan(client = 'Новий клієнт'): Plan {
       cashSplit: { UAH: 0.2, USD: 0.4, EUR: 0.4 }, ladder: [],
     },
     rates: { ...DEFAULT_RATES },
+    ratesSource: 'nbu',
     assets: [],
     portfolio: INSTRUMENTS.map((x) => ({ ...x, id: uid(), qty: 0, price: 0 })),
     rebalanceDeposit: 0,

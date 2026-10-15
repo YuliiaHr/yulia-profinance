@@ -1,0 +1,11 @@
+{
+  "name": "yulia-profinance",
+  "private": true,
+  "workspaces": [
+    "apps/planner"
+  ],
+  "scripts": {
+    "dev:planner": "npm run dev -w apps/planner",
+    "build": "bash scripts/build.sh"
+  }
+}

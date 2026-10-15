@@ -1,2 +1,7 @@
 .DS_Store
 offer/
+node_modules/
+dist/
+*.code-workspace
+*.tsbuildinfo
+.claude/settings.local.json

@@ -1,0 +1,38 @@
+/* Tokens: brand layer of packages/design-system, same as apps/landing */
+:root {
+  --cream: #F5E8D7;
+  --ink: #141414;
+  --accent: #F2600C;
+  --accent-hover: #ff7a2e;
+
+  --font-brand: "Unbounded", "Arial Black", sans-serif;
+  --font-ui: "Golos Text", system-ui, sans-serif;
+
+  --gutter: clamp(16px, 4vw, 32px);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--cream); color: var(--ink);
+  font: 500 16px/1.6 var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+}
+h1, p { margin: 0; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+.wrap {
+  min-height: 100vh; max-width: 760px; margin-inline: auto; padding: 32px var(--gutter);
+  display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 24px;
+}
+.logo { position: absolute; top: 24px; font: 800 18px/1 var(--font-brand); color: inherit; text-decoration: none; }
+.logo span { color: var(--accent); }
+.overline { font: 600 12px/1.3 var(--font-ui); letter-spacing: .1em; text-transform: uppercase; }
+h1 { font: 900 clamp(30px, 6vw, 60px)/1.08 var(--font-brand); letter-spacing: -.02em; }
+.plate { display: inline-block; background: var(--ink); color: var(--cream); padding: .28em .5em .32em; transform: rotate(-1.2deg); }
+.lead { font-size: clamp(17px, 2vw, 20px); line-height: 1.55; max-width: 34em; }
+.btn {
+  display: inline-flex; align-items: center; min-height: 46px; padding: 0 22px;
+  border-radius: 8px; background: var(--accent); color: var(--ink);
+  font-weight: 700; text-decoration: none;
+}
+.btn:hover { background: var(--accent-hover); }

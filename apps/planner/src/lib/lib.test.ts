@@ -131,3 +131,12 @@ describe('rebalance', () => {
     expect(r.lines[0].tradeValue).toBe(90)
   })
 })
+
+import { MARKET, MARKET_AS_OF } from '../data/assumptions'
+
+describe('market assumptions', () => {
+  it('has a valid date and either a source or an explicit warning', () => {
+    expect(Number.isNaN(new Date(MARKET_AS_OF).getTime())).toBe(false)
+    for (const m of MARKET) expect(Boolean(m.source) || m.unverified, m.label).toBe(true)
+  })
+})

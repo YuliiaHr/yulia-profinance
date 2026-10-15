@@ -7,7 +7,7 @@ import { CURRENCIES, money } from '../lib/format'
 import type { FreedomSettings } from '../state/plan'
 import type { SectionProps } from './types'
 
-export function Freedom({ plan, update, d }: SectionProps) {
+export function Freedom({ plan, update, d, go }: SectionProps) {
   const c = plan.currency
   const sym = CURRENCIES[c].symbol
   const f = plan.freedom
@@ -55,7 +55,7 @@ export function Freedom({ plan, update, d }: SectionProps) {
           </section>
 
           <section className="group">
-            <h3>Припущення</h3>
+            <h3>Припущення <button type="button" className="link-btn small" onClick={() => go('assumptions')}>усі припущення й ринкові дані →</button></h3>
             <Field label={<><Term k="returnRate">Дохідність</Term> інвестицій</>} hint={<>Для помірно-консервативного <Term k="riskProfile">ризик-профілю</Term> у доларах — близько 6%.</>}>
               <NumberInput label="Дохідність" percent value={f.returnRate} max={50} suffix="% на рік" onChange={(returnRate) => set({ returnRate })} />
             </Field>

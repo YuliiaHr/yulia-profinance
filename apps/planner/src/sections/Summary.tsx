@@ -3,6 +3,8 @@ import { money, percent, type Currency } from '../lib/format'
 import { PROGRAMS } from '../data/insurance'
 import { STAGES, STATUSES, type TaskStage } from '../data/templates'
 import { formatMonth } from './Goals'
+import { MARKET_AS_OF } from '../data/assumptions'
+import { formatDate } from './Assumptions'
 import type { SectionProps } from './types'
 
 /** One-page overview of the plan; this is what goes into the PDF. */
@@ -154,6 +156,17 @@ export function Summary({ plan, d }: SectionProps) {
             </ul>
           </div>
         ))}
+      </section>
+
+      <section className="summary__block">
+        <h3>Припущення плану</h3>
+        <dl className="kv">
+          <dt>Інфляція ({c})</dt><dd>{percent(f.inflation)} на рік</dd>
+          <dt>Дохідність інвестицій (до податків)</dt><dd>{percent(f.returnRate)} на рік</dd>
+          <dt>Ріст доходу</dt><dd>{percent(f.incomeGrowth)} на рік</dd>
+          <dt>Курси</dt><dd>1 $ = {plan.rates.USD.toLocaleString('uk-UA')} ₴ · 1 € = {plan.rates.EUR.toLocaleString('uk-UA')} ₴</dd>
+        </dl>
+        <p className="small muted">Ринкові дані для довідки — станом на {formatDate(MARKET_AS_OF)}.</p>
       </section>
 
       <p className="small muted summary__note">

@@ -4,6 +4,7 @@ import { Budget } from './sections/Budget'
 import { Freedom } from './sections/Freedom'
 import { Actions } from './sections/Actions'
 import { Assets } from './sections/Assets'
+import { Assumptions } from './sections/Assumptions'
 import { Goals } from './sections/Goals'
 import { Portfolio } from './sections/Portfolio'
 import { Protection } from './sections/Protection'
@@ -25,9 +26,15 @@ const STEPS: Array<{ id: StepId; n: string; title: string; short: string; Screen
   { id: 'summary', n: '✓', title: 'Підсумок', short: 'Підсумок', Screen: Summary },
 ]
 
+/** Pages reachable by link but not shown as numbered steps. */
+const EXTRA_PAGES: typeof STEPS = [
+  { id: 'assumptions', n: '', title: 'Припущення', short: 'Припущення', Screen: Assumptions },
+]
+const PAGES = [...STEPS, ...EXTRA_PAGES]
+
 const stepFromHash = (): StepId => {
   const h = window.location.hash.slice(1)
-  return STEPS.some((s) => s.id === h) ? (h as StepId) : 'budget'
+  return PAGES.some((s) => s.id === h) ? (h as StepId) : 'budget'
 }
 
 export default function App() {
@@ -52,8 +59,8 @@ export default function App() {
   }
 
   const index = STEPS.findIndex((s) => s.id === step)
-  const current = STEPS[index]
-  const next = STEPS[index + 1]
+  const current = PAGES.find((s) => s.id === step)!
+  const next = index >= 0 ? STEPS[index + 1] : undefined
   const props: SectionProps = { plan, update, d, go }
 
   return (
@@ -85,7 +92,15 @@ export default function App() {
           </div>
           <button
             type="button"
-            className="link-btn small"
+            className={`chip-btn${step === 'assumptions' ? ' is-active' : ''}`}
+            aria-current={step === 'assumptions' ? 'page' : undefined}
+            onClick={() => go('assumptions')}
+          >
+            Припущення
+          </button>
+          <button
+            type="button"
+            className="link-btn small plan-head__delete"
             onClick={() => confirm(`Видалити план «${plan.client}»? Його не можна буде відновити.`) && remove(plan.id)}
           >
             Видалити план

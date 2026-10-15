@@ -2,6 +2,7 @@ import { budgetTotals } from '../lib/budget'
 import { simulateFreedom, type FreedomInput } from '../lib/freedom'
 import { monthlyForGoal, monthsUntil } from '../lib/goals'
 import { reserveFund } from '../lib/reserve'
+import { assetKind } from '../data/assetKinds'
 import { convert, splitCash, type Rates } from '../lib/fx'
 import type { NbuRates } from '../lib/nbu'
 import type { Currency } from '../lib/format'
@@ -78,13 +79,16 @@ export function derive(plan: Plan, nbu: NbuRates | null = null, today = new Date
     ...plan.goals.map((g) => ({ target: g.id, name: g.name || 'Ціль без назви', need: g.cost, have: allocated(g.id) })),
     { target: 'freedom', name: 'Фінансова свобода', need: null, have: allocated('freedom') },
   ]
-  const unallocated = allocated('')
+  // Free money = unassigned quick-access assets; property, cars etc. are reported separately.
+  const unassigned = plan.assets.filter((a) => a.target === '')
+  const unallocated = unassigned.filter((a) => assetKind(a.kind).liquid).reduce((sum, a) => sum + toPlan(a.amount, a.currency), 0)
+  const unallocatedLongTerm = unassigned.filter((a) => !assetKind(a.kind).liquid).reduce((sum, a) => sum + toPlan(a.amount, a.currency), 0)
   const cashByCurrency = splitCash(reserve.parts.cash, plan.currency, plan.reserve.cashSplit, rates)
   const ladderTotal = plan.reserve.ladder.reduce((sum, b) => sum + toPlan(b.qty * b.price, b.currency), 0)
 
   const protectionYear = plan.protection.reduce((sum, x) => sum + x.price, 0)
 
-  return { toPlan, rates, ratesInfo, assetsTotal, allocation, unallocated, cashByCurrency, ladderTotal, protectionYear, totals, reserve, reserveMonths, reserveMonthly, freedomInput, freedom, goals, goalsMonthly }
+  return { unallocatedLongTerm, toPlan, rates, ratesInfo, assetsTotal, allocation, unallocated, cashByCurrency, ladderTotal, protectionYear, totals, reserve, reserveMonths, reserveMonthly, freedomInput, freedom, goals, goalsMonthly }
 }
 
 export type Derived = ReturnType<typeof derive>

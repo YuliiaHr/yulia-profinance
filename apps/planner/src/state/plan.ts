@@ -40,6 +40,9 @@ export type AssetTarget = string
 
 export interface Asset {
   id: string
+  /** Kind from data/assetKinds.ts */
+  kind: string
+  /** Optional description, e.g. «депозит у Моно до 11.2026» */
   name: string
   amount: number
   currency: Currency
@@ -174,9 +177,10 @@ export function examplePlan(): Plan {
   p.reserve.saved = 1500
   p.reserve.ladder = BOND_LADDER.map((b) => ({ ...b, id: uid() }))
   p.assets = [
-    { id: uid(), name: 'Готівка', amount: 1000, currency: 'USD', target: 'reserve.cash' },
-    { id: uid(), name: 'ОВДП', amount: 500, currency: 'USD', target: 'reserve.bonds' },
-    { id: uid(), name: 'Банка на подорож', amount: 13000, currency: 'UAH', target: '' },
+    { id: uid(), kind: 'cash', name: '', amount: 1000, currency: 'USD', target: 'reserve.cash' },
+    { id: uid(), kind: 'ovdp', name: 'Валютні ОВДП у Моно', amount: 500, currency: 'USD', target: 'reserve.bonds' },
+    { id: uid(), kind: 'jar', name: 'Банка на подорож', amount: 13000, currency: 'UAH', target: '' },
+    { id: uid(), kind: 'investments', name: 'ETF в Interactive Brokers', amount: 2500, currency: 'USD', target: 'freedom' },
   ]
   const trip = uid()
   p.goals = [

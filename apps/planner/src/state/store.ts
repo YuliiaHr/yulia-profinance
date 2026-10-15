@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { examplePlan, newPlan, type Plan } from './plan'
+import { guessKind } from '../data/assetKinds'
 
 /** Everything stays in this browser (decision in docs/decisions.md). */
 const KEY = 'yp.planner.v1'
@@ -28,7 +29,8 @@ function upgrade(p: Plan): Plan {
   const fresh = newPlan()
   // Plans in hryvnias are no longer supported: switch to dollars (rare, early test plans).
   const currency = (p.currency as string) === 'UAH' ? 'USD' : p.currency
-  return { ...fresh, ...p, currency, reserve: { ...fresh.reserve, ...p.reserve } }
+  const assets = (p.assets ?? []).map((a) => (a.kind ? a : { ...a, kind: guessKind(a.name) }))
+  return { ...fresh, ...p, currency, assets, reserve: { ...fresh.reserve, ...p.reserve } }
 }
 
 export function usePlans() {

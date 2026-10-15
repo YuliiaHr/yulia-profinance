@@ -1,6 +1,7 @@
 import { Fragment } from 'react'
 import { money, percent, type Currency } from '../lib/format'
 import { PROGRAMS } from '../data/insurance'
+import { assetKind } from '../data/assetKinds'
 import { STAGES, STATUSES, type TaskStage } from '../data/templates'
 import { formatMonth } from './Goals'
 import { MARKET_AS_OF } from '../data/assumptions'
@@ -102,13 +103,20 @@ export function Summary({ plan, d }: SectionProps) {
         ) : (
           <dl className="kv">
             <dt>Усього активів</dt><dd>{money(d.assetsTotal, c)}</dd>
+            {plan.assets.filter((a) => a.amount > 0).map((a) => (
+              <Fragment key={a.id}>
+                <dt className="muted">· {assetKind(a.kind).label}{a.name && ` (${a.name})`}</dt>
+                <dd className="muted">{money(d.toPlan(a.amount, a.currency), c)}</dd>
+              </Fragment>
+            ))}
             {d.allocation.filter((l) => l.have > 0 || (l.need ?? 0) > 0).map((l) => (
               <Fragment key={l.target}>
                 <dt>{l.name}</dt>
                 <dd>{money(l.have, c)}{l.need !== null && <span className="muted"> з {money(l.need, c)}</span>}</dd>
               </Fragment>
             ))}
-            <dt>Не розподілено</dt><dd>{money(d.unallocated, c)}</dd>
+            <dt>Вільні кошти без цілі</dt><dd>{money(d.unallocated, c)}</dd>
+            {d.unallocatedLongTerm > 0 && <><dt>Довгострокові активи без цілі</dt><dd>{money(d.unallocatedLongTerm, c)}</dd></>}
           </dl>
         )}
       </section>

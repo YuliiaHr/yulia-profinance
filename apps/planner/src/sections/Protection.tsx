@@ -30,7 +30,9 @@ export function Protection({ plan, update, d }: SectionProps) {
       all.filter((p) => {
         if (catId !== 'critical') return true
         if (covers.some((cv) => !p.covers?.includes(cv))) return false
-        if (where !== 'any' && !p.where?.includes(where)) return false
+        // 'ua' = treatment only in Ukraine; 'abroad' = treatment abroad is possible.
+        if (where === 'ua' && p.where?.includes('abroad')) return false
+        if (where === 'abroad' && !p.where?.includes('abroad')) return false
         if (fitsAge && p.maxEntryAge !== undefined && age > p.maxEntryAge) return false
         return true
       }),
@@ -111,7 +113,7 @@ export function Protection({ plan, update, d }: SectionProps) {
               </div>
               <div className="filters__group">
                 <span className="filters__label">Лікування</span>
-                {([['any', 'Будь-де'], ['ua', 'В Україні'], ['abroad', 'За кордоном']] as const).map(([v, label]) => (
+                {([['any', 'Будь-де'], ['ua', 'Лише в Україні'], ['abroad', 'Є лікування за кордоном']] as const).map(([v, label]) => (
                   <label key={v} className="check">
                     <input type="radio" name="where" checked={where === v} onChange={() => setWhere(v)} />
                     {label}
@@ -122,6 +124,25 @@ export function Protection({ plan, update, d }: SectionProps) {
                 <input type="checkbox" checked={fitsAge} onChange={(e) => setFitsAge(e.target.checked)} />
                 Лише ті, що можна оформити у {age} {age % 10 === 1 && age % 100 !== 11 ? 'рік' : 'років'}
               </label>
+              <p className="filters__count" aria-live="polite">
+                Показано {list.length} з {all.length}
+                {list.length < all.length && (
+                  <>
+                    {' · '}
+                    <button
+                      type="button"
+                      className="link-btn"
+                      onClick={() => {
+                        setCovers([])
+                        setWhere('any')
+                        setFitsAge(false)
+                      }}
+                    >
+                      скинути фільтри
+                    </button>
+                  </>
+                )}
+              </p>
             </div>
           )}
 

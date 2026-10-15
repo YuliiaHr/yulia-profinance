@@ -50,7 +50,7 @@ export function Reserve({ plan, update, d, go }: SectionProps) {
           <Field label="Готівка" hint="Під рукою в перші дні. Краще в різних валютах: приблизно 20% гривні, 40% долари, 40% євро.">
             <NumberInput label="Готівка, частка" percent value={r.split.cash} max={100} suffix="%" onChange={(cash) => setSplit({ cash })} />
           </Field>
-          <Field label={<Term k="ovdp" />} hint="Гроші працюють і захищені від інфляції; продати можна за кілька днів.">
+          <Field label={<Term k="ovdp" />} hint="Гроші працюють і захищені від інфляції. Продати можна за кілька хвилин у застосунку банку, кошти надходять на рахунок протягом одного робочого дня.">
             <NumberInput label="ОВДП, частка" percent value={r.split.bonds} max={100} suffix="%" onChange={(bonds) => setSplit({ bonds })} />
           </Field>
           <Field label={<><Term k="deposit">Депозит</Term>, рахунок, <Term k="stablecoin">стейблкоїни</Term></>}>

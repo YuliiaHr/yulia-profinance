@@ -76,6 +76,8 @@ export interface Instrument {
   /** For the rebalance calculator. */
   qty: number
   price: number
+  /** true = price typed by hand; otherwise the daily justETF quote is used when available. */
+  priceManual?: boolean
 }
 
 export interface Task {

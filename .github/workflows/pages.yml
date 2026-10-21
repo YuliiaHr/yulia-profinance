@@ -3,6 +3,9 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Daily rebuild so ETF prices in the planner stay fresh (07:00 Kyiv in winter).
+  schedule:
+    - cron: '0 5 * * *'
 permissions:
   contents: read
   pages: write

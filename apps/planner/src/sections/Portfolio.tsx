@@ -6,6 +6,7 @@ import { Term } from '../components/Term'
 import { STRATEGY_LINKS } from '../data/templates'
 import { money, percent, plainNumber } from '../lib/format'
 import { rebalance } from '../lib/portfolio'
+import { effectivePrice, usePrices } from '../lib/prices'
 import { uid, type Instrument } from '../state/plan'
 import type { SectionProps } from './types'
 
@@ -16,7 +17,9 @@ export function Portfolio({ plan, update, d, go }: SectionProps) {
     update((p) => ({ ...p, portfolio: p.portfolio.map((x) => (x.id === id ? { ...x, ...patch } : x)) }))
   const monthly = d.freedom.monthlySaving
   const weightTotal = list.reduce((s, x) => s + x.weight, 0)
-  const rb = rebalance(list, plan.rebalanceDeposit)
+  const quotes = usePrices()
+  const priced = list.map((x) => ({ ...x, ...effectivePrice(x, quotes) }))
+  const rb = rebalance(priced, plan.rebalanceDeposit)
   const [editing, setEditing] = useState<string | null>(null)
 
   return (
@@ -105,8 +108,9 @@ export function Portfolio({ plan, update, d, go }: SectionProps) {
       <section className="group">
         <h3><Term k="rebalance">Ребаланс</Term> портфеля</h3>
         <p className="small muted">
-          Раз на рік: впишіть, скільки паперів уже є і їхню поточну ціну (у <Term k="broker">брокера</Term> або на justETF), та суму
-          поповнення. Калькулятор покаже, що докупити, щоб повернути частки до плану.
+          Раз на рік: впишіть, скільки паперів уже є, та суму поповнення. Ціни підтягуються щодня з justETF; для інших
+          фондів або якщо потрібна своя ціна (наприклад, з <Term k="broker">брокера</Term>) — впишіть її вручну.
+          Калькулятор покаже, що докупити, щоб повернути частки до плану.
         </p>
         <div className="rebalance-top">
           <label>
@@ -129,11 +133,22 @@ export function Portfolio({ plan, update, d, go }: SectionProps) {
                   <tr key={x.id}>
                     <th>{x.ticker || '—'}</th>
                     <td><NumberInput label={`Кількість ${x.ticker}`} value={x.qty} onChange={(qty) => set(x.id, { qty })} /></td>
-                    <td><NumberInput label={`Ціна ${x.ticker}`} value={x.price} onChange={(price) => set(x.id, { price })} /></td>
+                    <td className="price-cell">
+                      <NumberInput label={`Ціна ${x.ticker}`} value={priced[i].price} onChange={(price) => set(x.id, { price, priceManual: true })} />
+                      <span className="price-cell__src">
+                        {priced[i].quote ? (
+                          <>justETF, {formatDay(priced[i].quote!.date)}</>
+                        ) : quotes[x.isin] ? (
+                          <>вручну · <button type="button" className="link-btn" onClick={() => set(x.id, { priceManual: false })}>брати з justETF</button></>
+                        ) : (
+                          <>вручну</>
+                        )}
+                      </span>
+                    </td>
                     <td>{plainNumber(l.value)} $</td>
                     <td>{percent(l.actualWeight)} / {percent(x.weight)}</td>
                     <td className={l.tradeWhole > 0 ? 'is-good-text' : l.tradeWhole < 0 ? 'is-bad-text' : undefined}>
-                      {x.price > 0 ? (
+                      {priced[i].price > 0 ? (
                         <span className="trade">
                           <b>{l.tradeWhole > 0 ? 'купити ' : l.tradeWhole < 0 ? 'продати ' : ''}{Math.abs(l.tradeWhole)} шт</b>
                           <span className="muted">≈ {plainNumber(Math.abs(l.tradeValue))} $</span>
@@ -150,3 +165,5 @@ export function Portfolio({ plan, update, d, go }: SectionProps) {
     </div>
   )
 }
+
+const formatDay = (iso: string) => (iso ? new Date(iso).toLocaleDateString('uk-UA', { day: 'numeric', month: 'short' }) : '')

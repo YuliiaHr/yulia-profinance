@@ -441,6 +441,8 @@ input.goals__name:focus { border-color: var(--ink); background: var(--field); ou
 .inst__weight { min-width: 110px; }
 .table--rebalance td { min-width: 96px; }
 .table--rebalance .num { max-width: 140px; margin-left: auto; }
+.price-cell { text-align: right; }
+.price-cell__src { display: block; margin-top: 4px; font-size: 11.5px; opacity: .7; white-space: nowrap; }
 .table--rebalance td:last-child { white-space: nowrap; min-width: 150px; }
 .trade { display: grid; text-align: right; }
 .rebalance-top { display: flex; flex-wrap: wrap; align-items: end; gap: 12px 32px; margin: 4px 0 14px; padding: 16px 18px; border-radius: 8px; background: var(--ink); color: var(--on-ink); }

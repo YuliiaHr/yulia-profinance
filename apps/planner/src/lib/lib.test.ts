@@ -218,3 +218,21 @@ describe('IBKR report', () => {
     expect(matchPosition({ isin: 'X', ticker: 'IMID' }, pos)).toBeUndefined()
   })
 })
+
+import { makeBackup, mergePlans, readBackup } from '../state/backup'
+
+describe('backup', () => {
+  const plan = (id: string, updatedAt: number) => ({ ...newPlan(id), id, updatedAt })
+  it('round-trips through a file', () => {
+    const plans = [plan('a', 1)]
+    expect(readBackup(JSON.stringify(makeBackup(plans)))).toEqual(plans)
+    expect(() => readBackup('{"foo":1}')).toThrow()
+  })
+  it('adds new plans and replaces only with newer copies', () => {
+    const r = mergePlans([plan('a', 5), plan('b', 5)], [plan('a', 9), plan('b', 1), plan('c', 1)])
+    expect([r.added, r.updated, r.kept]).toEqual([1, 1, 1])
+    expect(r.plans.find((p) => p.id === 'a')!.updatedAt).toBe(9)
+    expect(r.plans.find((p) => p.id === 'b')!.updatedAt).toBe(5)
+    expect(r.plans).toHaveLength(3)
+  })
+})

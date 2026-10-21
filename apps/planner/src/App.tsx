@@ -14,6 +14,7 @@ import type { SectionProps, StepId } from './sections/types'
 import { derive } from './state/derive'
 import { usePlans } from './state/store'
 import { useNbuRates } from './lib/nbu'
+import { Backup } from './components/Backup'
 
 const STEPS: Array<{ id: StepId; n: string; title: string; short: string; Screen: (p: SectionProps) => JSX.Element }> = [
   { id: 'budget', n: '1', title: 'Доходи і витрати', short: 'Доходи', Screen: Budget },
@@ -39,7 +40,7 @@ const stepFromHash = (): StepId => {
 }
 
 export default function App() {
-  const { plans, plan, update, select, create, remove } = usePlans()
+  const { plans, plan, update, select, create, remove, importPlans } = usePlans()
   const [step, setStep] = useState<StepId>(stepFromHash)
   const nbu = useNbuRates()
   const d = useMemo(() => derive(plan, nbu), [plan, nbu])
@@ -100,6 +101,7 @@ export default function App() {
           >
             Припущення
           </button>
+          <Backup plans={plans} onImport={importPlans} />
           <button
             type="button"
             className="link-btn small plan-head__delete"
@@ -129,7 +131,7 @@ export default function App() {
       </main>
 
       <footer className="foot no-print">
-        <div className="wrap small muted">Дані зберігаються лише в цьому браузері й нікуди не надсилаються.</div>
+        <div className="wrap small muted">Дані зберігаються лише в цьому браузері й нікуди не надсилаються. Час від часу зберігайте копію кнопкою «Зберегти копію» вгорі.</div>
       </footer>
     </>
   )

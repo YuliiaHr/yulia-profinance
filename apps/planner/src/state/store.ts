@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 import { examplePlan, newPlan, type Plan } from './plan'
 import { guessKind } from '../data/assetKinds'
+import { mergePlans } from './backup'
 
 /** Everything stays in this browser (decision in docs/decisions.md). */
 const KEY = 'yp.planner.v1'
@@ -67,5 +68,12 @@ export function usePlans() {
       return { plans, currentId: plans[0].id }
     })
 
-  return { plans: state.plans, plan, update, select, create, remove }
+  /** Restores plans from a backup file; returns what changed. */
+  const importPlans = (incoming: Plan[]) => {
+    const merged = mergePlans(state.plans, incoming.map(upgrade))
+    setState((s) => ({ ...s, plans: merged.plans }))
+    return merged
+  }
+
+  return { plans: state.plans, plan, update, select, create, remove, importPlans }
 }

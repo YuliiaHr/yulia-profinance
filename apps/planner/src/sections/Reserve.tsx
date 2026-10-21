@@ -1,5 +1,6 @@
 import { Field, Stat } from '../components/Field'
 import { NumberInput } from '../components/NumberInput'
+import { ReserveChart } from '../components/ReserveChart'
 import { Term } from '../components/Term'
 import { CURRENCIES, money, percent } from '../lib/format'
 import type { ReserveSplit } from '../lib/reserve'
@@ -47,6 +48,7 @@ export function Reserve({ plan, update, d, go }: SectionProps) {
             Гроші резервного фонду мають бути доступні швидко (висока <Term k="liquidity">ліквідність</Term>), тому
             ділимо їх на три частини.
           </p>
+          <ReserveChart target={reserve.target} parts={reserve.parts} shares={r.split} cashByCurrency={d.cashByCurrency} cashShares={r.cashSplit} ladder={r.ladder} currency={c} />
           <Field label="Готівка" hint="Під рукою в перші дні. Краще в різних валютах: приблизно 20% гривні, 40% долари, 40% євро.">
             <NumberInput label="Готівка, частка" percent value={r.split.cash} max={100} suffix="%" onChange={(cash) => setSplit({ cash })} />
           </Field>

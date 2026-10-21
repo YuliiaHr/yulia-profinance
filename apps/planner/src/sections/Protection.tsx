@@ -74,7 +74,7 @@ export function Protection({ plan, update, d }: SectionProps) {
     <div className="stack stack--tight">
       <p className="lead">
         <Term k="insurance">Страхування</Term> захищає план від подій, на які не вистачить жодного резервного фонду:
-        тяжкої хвороби, втрати працездатності, руйнування житла. Порівняйте програми й додайте обрані в план клієнта.
+        тяжкої хвороби, втрати працездатності, руйнування житла.
       </p>
 
       <div className="chips" role="tablist" aria-label="Вид страхування">

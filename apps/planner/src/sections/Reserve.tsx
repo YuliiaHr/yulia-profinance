@@ -67,7 +67,7 @@ export function Reserve({ plan, update, d, go }: SectionProps) {
           <div className="cash-split">
             {CASH_CURRENCIES.map((cur) => (
               <div key={cur} className="cash-split__item">
-                <span>{CASH_LABELS[cur]}</span>
+                <span className="cash-split__label">{CASH_LABELS[cur]}</span>
                 <NumberInput
                   label={`Частка готівки, ${cur}`}
                   percent

@@ -11,24 +11,28 @@ const templates = readFileSync(join(root, 'apps/planner/src/data/templates.ts'),
 const isins = [...new Set([...templates.matchAll(/isin: '([A-Z0-9]{12})'/g)].map((m) => m[1]))]
 const out = join(root, 'apps/planner/public/prices.json')
 
+// quotes[isin][currency] — in both plan currencies, so a euro plan rebalances in euros.
 const quotes = {}
 for (const isin of isins) {
-  try {
-    const res = await fetch(`https://www.justetf.com/api/etfs/${isin}/quote?locale=en&currency=USD`, {
-      headers: { 'User-Agent': 'Mozilla/5.0 (yulia.profinance planner)' },
-      signal: AbortSignal.timeout(15000),
-    })
-    if (!res.ok) throw new Error(`HTTP ${res.status}`)
-    const j = await res.json()
-    const price = j?.latestQuote?.raw
-    if (typeof price === 'number' && price > 0) {
-      quotes[isin] = { price, currency: 'USD', date: j.latestQuoteDate ?? '', source: 'justETF' }
+  for (const currency of ['USD', 'EUR']) {
+    try {
+      const res = await fetch(`https://www.justetf.com/api/etfs/${isin}/quote?locale=en&currency=${currency}`, {
+        headers: { 'User-Agent': 'Mozilla/5.0 (yulia.profinance planner)' },
+        signal: AbortSignal.timeout(15000),
+      })
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
+      const j = await res.json()
+      const price = j?.latestQuote?.raw
+      if (typeof price === 'number' && price > 0) {
+        quotes[isin] ??= {}
+        quotes[isin][currency] = { price, date: j.latestQuoteDate ?? '', source: 'justETF' }
+      }
+    } catch (e) {
+      console.warn(`prices: ${isin} ${currency} skipped (${e.message})`)
     }
-  } catch (e) {
-    console.warn(`prices: ${isin} skipped (${e.message})`)
   }
 }
 
 mkdirSync(dirname(out), { recursive: true })
 writeFileSync(out, JSON.stringify({ updated: new Date().toISOString(), quotes }, null, 2))
-console.log(`prices: ${Object.keys(quotes).length}/${isins.length} written to apps/planner/public/prices.json`)
+console.log(`prices: ${Object.keys(quotes).length}/${isins.length} ISINs written to apps/planner/public/prices.json`)

@@ -108,7 +108,7 @@ export function Reserve({ plan, update, d, go }: SectionProps) {
             <button
               type="button"
               className="link-btn"
-              onClick={() => setReserve({ ladder: [...r.ladder, { id: uid(), qty: 1, price: 1000, currency: 'USD', months: 12, note: 'Після погашення купити нову на 12 міс' }] })}
+              onClick={() => setReserve({ ladder: [...r.ladder, { id: uid(), qty: 1, price: 1000, currency: c, months: 12, note: 'Після погашення купити нову на 12 міс' }] })}
             >
               + Додати облігацію
             </button>

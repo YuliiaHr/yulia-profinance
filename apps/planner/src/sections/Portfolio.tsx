@@ -4,7 +4,7 @@ import { NumberInput } from '../components/NumberInput'
 import { InstrumentEditor, instrumentUrl } from '../components/InstrumentEditor'
 import { Term } from '../components/Term'
 import { STRATEGY_LINKS } from '../data/templates'
-import { money, percent, plainNumber } from '../lib/format'
+import { CURRENCIES, money, percent } from '../lib/format'
 import { rebalance } from '../lib/portfolio'
 import { effectivePrice, usePrices } from '../lib/prices'
 import { uid, type Instrument } from '../state/plan'
@@ -18,7 +18,7 @@ export function Portfolio({ plan, update, d, go }: SectionProps) {
   const monthly = d.freedom.monthlySaving
   const weightTotal = list.reduce((s, x) => s + x.weight, 0)
   const quotes = usePrices()
-  const priced = list.map((x) => ({ ...x, ...effectivePrice(x, quotes) }))
+  const priced = list.map((x) => ({ ...x, ...effectivePrice(x, quotes, c) }))
   const rb = rebalance(priced, plan.rebalanceDeposit)
   const [editing, setEditing] = useState<string | null>(null)
 
@@ -115,16 +115,16 @@ export function Portfolio({ plan, update, d, go }: SectionProps) {
         <div className="rebalance-top">
           <label>
             Сума поповнення
-            <NumberInput label="Сума поповнення" value={plan.rebalanceDeposit} suffix="$" onChange={(rebalanceDeposit) => update((p) => ({ ...p, rebalanceDeposit }))} />
+            <NumberInput label="Сума поповнення" value={plan.rebalanceDeposit} suffix={CURRENCIES[c].symbol} onChange={(rebalanceDeposit) => update((p) => ({ ...p, rebalanceDeposit }))} />
           </label>
-          <Stat label="Портфель зараз" value={`${plainNumber(rb.total)} $`} />
-          <Stat label="Після поповнення" value={`${plainNumber(rb.after)} $`} tone="accent" />
+          <Stat label="Портфель зараз" value={money(rb.total, c)} />
+          <Stat label="Після поповнення" value={money(rb.after, c)} tone="accent" />
           <p className="small muted">Кількість округлено до цілих паперів у менший бік, щоб не вийти за суму.</p>
         </div>
         <div className="table-wrap">
           <table className="table table--rebalance">
             <thead>
-              <tr><th>Тікер</th><th>Є, шт</th><th>Ціна, $</th><th>Сума</th><th>Частка: зараз / план</th><th>Купити / продати</th></tr>
+              <tr><th>Тікер</th><th>Є, шт</th><th>Ціна, {CURRENCIES[c].symbol}</th><th>Сума</th><th>Частка: зараз / план</th><th>Купити / продати</th></tr>
             </thead>
             <tbody>
               {list.map((x, i) => {
@@ -138,20 +138,20 @@ export function Portfolio({ plan, update, d, go }: SectionProps) {
                       <span className="price-cell__src">
                         {priced[i].quote ? (
                           <>justETF, {formatDay(priced[i].quote!.date)}</>
-                        ) : quotes[x.isin] ? (
+                        ) : quotes[x.isin]?.[c] ? (
                           <>вручну · <button type="button" className="link-btn" onClick={() => set(x.id, { priceManual: false })}>брати з justETF</button></>
                         ) : (
                           <>вручну</>
                         )}
                       </span>
                     </td>
-                    <td>{plainNumber(l.value)} $</td>
+                    <td>{money(l.value, c)}</td>
                     <td>{percent(l.actualWeight)} / {percent(x.weight)}</td>
                     <td className={l.tradeWhole > 0 ? 'is-good-text' : l.tradeWhole < 0 ? 'is-bad-text' : undefined}>
                       {priced[i].price > 0 ? (
                         <span className="trade">
                           <b>{l.tradeWhole > 0 ? 'купити ' : l.tradeWhole < 0 ? 'продати ' : ''}{Math.abs(l.tradeWhole)} шт</b>
-                          <span className="muted">≈ {plainNumber(Math.abs(l.tradeValue))} $</span>
+                          <span className="muted">≈ {money(Math.abs(l.tradeValue), c)}</span>
                         </span>
                       ) : <span className="muted">впишіть ціну</span>}
                     </td>

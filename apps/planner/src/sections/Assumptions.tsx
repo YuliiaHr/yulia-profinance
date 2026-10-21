@@ -31,7 +31,7 @@ export function Assumptions({ plan, update, d, go }: SectionProps) {
           <Field label={<><Term k="inflation" />, {CURRENCIES[plan.currency].symbol}</>} hint={inflationHint}>
             <NumberInput label="Інфляція" percent value={f.inflation} max={50} suffix="% на рік" onChange={(inflation) => setF({ inflation })} />
           </Field>
-          <Field label={<><Term k="returnRate">Дохідність</Term> інвестицій</>} hint={<>Середня на рік, до податків. Для помірно-консервативного <Term k="riskProfile">ризик-профілю</Term> у доларах — близько 6%.</>}>
+          <Field label={<><Term k="returnRate">Дохідність</Term> інвестицій</>} hint={<>Середня на рік, до податків. Для помірно-консервативного <Term k="riskProfile">ризик-профілю</Term> {plan.currency === 'USD' ? 'у доларах — близько 6%.' : 'у доларах беруть близько 6%; для портфеля в євро уточніть цифру.'}</>}>
             <NumberInput label="Дохідність" percent value={f.returnRate} max={50} suffix="% на рік" onChange={(returnRate) => setF({ returnRate })} />
           </Field>
           <Field label={<Term k="incomeGrowth" />}>

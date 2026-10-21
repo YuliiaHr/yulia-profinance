@@ -56,7 +56,7 @@ export function Freedom({ plan, update, d, go }: SectionProps) {
 
           <section className="group">
             <h3>Припущення <button type="button" className="link-btn small" onClick={() => go('assumptions')}>усі припущення й ринкові дані →</button></h3>
-            <Field label={<><Term k="returnRate">Дохідність</Term> інвестицій</>} hint={<>Для помірно-консервативного <Term k="riskProfile">ризик-профілю</Term> у доларах — близько 6%.</>}>
+            <Field label={<><Term k="returnRate">Дохідність</Term> інвестицій</>} hint={<>Для помірно-консервативного <Term k="riskProfile">ризик-профілю</Term> {c === 'USD' ? 'у доларах — близько 6%.' : 'у доларах беруть близько 6%; для портфеля в євро уточніть цифру.'}</>}>
               <NumberInput label="Дохідність" percent value={f.returnRate} max={50} suffix="% на рік" onChange={(returnRate) => set({ returnRate })} />
             </Field>
             <Field label={<Term k="inflation" />}>

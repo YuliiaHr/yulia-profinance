@@ -70,6 +70,8 @@ export interface Instrument {
   description: string
   ter: number
   buyNote: string
+  /** Link to the instrument page; empty = justETF by ISIN. */
+  url?: string
   factsheet?: string
   /** For the rebalance calculator. */
   qty: number

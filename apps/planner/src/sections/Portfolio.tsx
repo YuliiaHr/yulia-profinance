@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { Stat } from '../components/Field'
 import { NumberInput } from '../components/NumberInput'
+import { InstrumentEditor, instrumentUrl } from '../components/InstrumentEditor'
 import { Term } from '../components/Term'
 import { STRATEGY_LINKS } from '../data/templates'
 import { money, percent, plainNumber } from '../lib/format'
@@ -15,6 +17,7 @@ export function Portfolio({ plan, update, d, go }: SectionProps) {
   const monthly = d.freedom.monthlySaving
   const weightTotal = list.reduce((s, x) => s + x.weight, 0)
   const rb = rebalance(list, plan.rebalanceDeposit)
+  const [editing, setEditing] = useState<string | null>(null)
 
   return (
     <div className="stack">
@@ -42,17 +45,24 @@ export function Portfolio({ plan, update, d, go }: SectionProps) {
               {list.map((x) => (
                 <tr key={x.id}>
                   <td>
-                    <span className="inst__class">{x.assetClass}</span>
-                    <input className="inst__ticker" aria-label="Тікер" value={x.ticker} onChange={(e) => set(x.id, { ticker: e.target.value.toUpperCase() })} />
+                    {editing === x.id ? (
+                      <InstrumentEditor x={x} set={(patch) => set(x.id, patch)} onDone={() => setEditing(null)} />
+                    ) : (
+                    <>
+                    <span className="inst__class">{x.assetClass || 'Клас не вказано'}</span>
+                    <span className="inst__ticker">{x.ticker || '—'}</span>
                     <span className="inst__name">{x.name}</span>
                     {x.description && <span className="inst__desc">{x.description}</span>}
                     <span className="inst__meta">
                       {x.isin && <><Term k="isin">ISIN</Term> {x.isin} · </>}
                       {x.currency}{x.domicile && ` · ${x.domicile}`}
-                      {x.isin && <> · <a href={`https://www.justetf.com/en/etf-profile.html?isin=${x.isin}`} target="_blank" rel="noopener">justETF ↗</a></>}
+                      {instrumentUrl(x) && <> · <a href={instrumentUrl(x)} target="_blank" rel="noopener">{x.url ? 'Сторінка ↗' : 'justETF ↗'}</a></>}
                       {x.factsheet && <> · <a href={x.factsheet} target="_blank" rel="noopener">Factsheet ↗</a></>}
                     </span>
                     {x.buyNote && <span className="inst__note">! {x.buyNote}</span>}
+                    <button type="button" className="link-btn small inst__edit" onClick={() => setEditing(x.id)}>Змінити</button>
+                    </>
+                    )}
                   </td>
                   <td className="inst__weight"><NumberInput label={`Частка ${x.ticker}`} percent value={x.weight} max={100} suffix="%" onChange={(weight) => set(x.id, { weight })} /></td>
                   <td>{money(monthly * x.weight, c)}</td>
@@ -78,7 +88,11 @@ export function Portfolio({ plan, update, d, go }: SectionProps) {
           <button
             type="button"
             className="link-btn"
-            onClick={() => update((p) => ({ ...p, portfolio: [...p.portfolio, { id: uid(), assetClass: '', ticker: '', name: '', isin: '', weight: 0, currency: 'USD', domicile: '', description: '', ter: 0, buyNote: '', qty: 0, price: 0 }] }))}
+            onClick={() => {
+              const id = uid()
+              update((p) => ({ ...p, portfolio: [...p.portfolio, { id, assetClass: '', ticker: '', name: '', isin: '', weight: 0, currency: 'USD', domicile: '', description: '', ter: 0, buyNote: '', qty: 0, price: 0 }] }))
+              setEditing(id)
+            }}
           >
             + Додати інструмент
           </button>

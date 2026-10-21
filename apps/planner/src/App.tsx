@@ -101,7 +101,7 @@ export default function App() {
           >
             Припущення
           </button>
-          <Backup plans={plans} onImport={importPlans} />
+          <Backup plans={plans} current={plan} onImport={importPlans} />
           <button
             type="button"
             className="link-btn small plan-head__delete"
@@ -131,7 +131,7 @@ export default function App() {
       </main>
 
       <footer className="foot no-print">
-        <div className="wrap small muted">Дані зберігаються лише в цьому браузері й нікуди не надсилаються. Час від часу зберігайте копію кнопкою «Зберегти копію» вгорі.</div>
+        <div className="wrap small muted">Дані зберігаються лише в цьому браузері й нікуди не надсилаються. Час від часу зберігайте «Копію всіх планів» кнопкою вгорі.</div>
       </footer>
     </>
   )

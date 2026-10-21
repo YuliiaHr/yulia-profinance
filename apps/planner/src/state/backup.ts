@@ -44,5 +44,8 @@ export function mergePlans(current: Plan[], incoming: Plan[]): MergeResult {
   return { plans: [...byId.values()], added, updated, kept }
 }
 
+export const planFileName = (client: string, now = new Date()) =>
+  `план-${(client || 'клієнт').trim().replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, '-')}-${now.toISOString().slice(0, 10)}.json`
+
 export const backupFileName = (now = new Date()) =>
   `плани-клієнтів-${now.toISOString().slice(0, 10)}.json`

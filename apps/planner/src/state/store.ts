@@ -71,7 +71,9 @@ export function usePlans() {
   /** Restores plans from a backup file; returns what changed. */
   const importPlans = (incoming: Plan[]) => {
     const merged = mergePlans(state.plans, incoming.map(upgrade))
-    setState((s) => ({ ...s, plans: merged.plans }))
+    // A file with one plan (from or for a client) opens that plan straight away.
+    const open = incoming.length === 1 ? incoming[0].id : null
+    setState((s) => ({ ...s, plans: merged.plans, currentId: open ?? s.currentId }))
     return merged
   }
 

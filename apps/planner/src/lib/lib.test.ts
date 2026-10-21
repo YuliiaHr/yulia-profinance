@@ -171,3 +171,50 @@ describe('NBU rates', () => {
     expect(derive(p, null).rates.USD).toBe(p.rates.USD)
   })
 })
+
+import { matchPosition, parseCsvLine, parseIbkrCsv } from './ibkr'
+
+describe('IBKR report', () => {
+  it('parses quoted CSV lines', () => {
+    expect(parseCsvLine('a,"b, c","say ""hi""",1')).toEqual(['a', 'b, c', 'say "hi"', '1'])
+  })
+
+  it('reads an Activity Statement', () => {
+    const csv = [
+      'Statement,Header,Field Name,Field Value',
+      'Statement,Data,Period,"October 1, 2026 - October 20, 2026"',
+      'Open Positions,Header,DataDiscriminator,Asset Category,Currency,Symbol,Quantity,Mult,Cost Price,Cost Basis,Close Price,Value,Unrealized P/L,Code',
+      'Open Positions,Data,Summary,Stocks,USD,IMID,90,1,12.5,1125,13.21,1188.9,63.9,',
+      'Open Positions,Data,Lot,Stocks,USD,IMID,90,1,12.5,1125,13.21,1188.9,63.9,',
+      'Open Positions,Data,Summary,Stocks,USD,AGAC,"1,200",1,5.1,6120,5.35,6420,300,',
+      'Open Positions,Total,,Stocks,USD,,,,,7245,,7608.9,363.9,',
+      'Financial Instrument Information,Header,Asset Category,Symbol,Description,Conid,Security ID,Listing Exch,Multiplier,Type,Code',
+      'Financial Instrument Information,Data,Stocks,IMID,SPDR MSCI ACWI IMI,123,IE00B3YLTY66,LSEETF,1,ETF,',
+      'Financial Instrument Information,Data,Stocks,AGAC,ISHARES GLOBAL AGG,456,IE000FHBZDZ8,LSEETF,1,ETF,',
+    ].join('\n')
+    const r = parseIbkrCsv(csv)
+    expect(r.date).toBe('October 1, 2026 - October 20, 2026')
+    expect(r.positions).toEqual([
+      { symbol: 'IMID', isin: 'IE00B3YLTY66', quantity: 90, price: 13.21, currency: 'USD', description: '' },
+      { symbol: 'AGAC', isin: 'IE000FHBZDZ8', quantity: 1200, price: 5.35, currency: 'USD', description: '' },
+    ])
+  })
+
+  it('reads a flat Flex Query export', () => {
+    const csv = [
+      '"ClientAccountID","CurrencyPrimary","AssetClass","Symbol","Description","ISIN","Quantity","MarkPrice","PositionValue"',
+      '"U123","EUR","STK","VWCE","VANGUARD FTSE ALL-WORLD","IE00BK5BQT80","15","120.5","1807.5"',
+      '"U123","USD","CASH","USD","","","1000","1","1000"',
+    ].join('\n')
+    const r = parseIbkrCsv(csv)
+    expect(r.positions).toEqual([
+      { symbol: 'VWCE', isin: 'IE00BK5BQT80', quantity: 15, price: 120.5, currency: 'EUR', description: 'VANGUARD FTSE ALL-WORLD' },
+    ])
+  })
+
+  it('matches by ISIN, then by ticker', () => {
+    const pos = [{ symbol: 'XGDU', isin: '', quantity: 1, price: 63, currency: 'USD', description: '' }]
+    expect(matchPosition({ isin: 'DE000A2T0VU5', ticker: 'xgdu' }, pos)?.quantity).toBe(1)
+    expect(matchPosition({ isin: 'X', ticker: 'IMID' }, pos)).toBeUndefined()
+  })
+})

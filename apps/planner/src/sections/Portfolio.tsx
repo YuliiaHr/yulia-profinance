@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Stat } from '../components/Field'
 import { NumberInput } from '../components/NumberInput'
+import { IbkrImport } from '../components/IbkrImport'
 import { InstrumentEditor, instrumentUrl } from '../components/InstrumentEditor'
 import { Term } from '../components/Term'
 import { STRATEGY_LINKS } from '../data/templates'
@@ -112,6 +113,7 @@ export function Portfolio({ plan, update, d, go }: SectionProps) {
           фондів або якщо потрібна своя ціна (наприклад, з <Term k="broker">брокера</Term>) — впишіть її вручну.
           Калькулятор покаже, що докупити, щоб повернути частки до плану.
         </p>
+        <IbkrImport instruments={list} currency={c} rates={d.rates} onApply={(portfolio) => update((p) => ({ ...p, portfolio }))} />
         <div className="rebalance-top">
           <label>
             Сума поповнення
@@ -134,14 +136,14 @@ export function Portfolio({ plan, update, d, go }: SectionProps) {
                     <th>{x.ticker || '—'}</th>
                     <td><NumberInput label={`Кількість ${x.ticker}`} value={x.qty} onChange={(qty) => set(x.id, { qty })} /></td>
                     <td className="price-cell">
-                      <NumberInput label={`Ціна ${x.ticker}`} value={priced[i].price} onChange={(price) => set(x.id, { price, priceManual: true })} />
+                      <NumberInput label={`Ціна ${x.ticker}`} value={priced[i].price} onChange={(price) => set(x.id, { price, priceManual: true, priceNote: undefined })} />
                       <span className="price-cell__src">
                         {priced[i].quote ? (
                           <>justETF, {formatDay(priced[i].quote!.date)}</>
                         ) : quotes[x.isin]?.[c] ? (
-                          <>вручну · <button type="button" className="link-btn" onClick={() => set(x.id, { priceManual: false })}>брати з justETF</button></>
+                          <>{x.priceNote ?? 'вручну'} · <button type="button" className="link-btn" onClick={() => set(x.id, { priceManual: false, priceNote: undefined })}>брати з justETF</button></>
                         ) : (
-                          <>вручну</>
+                          <>{x.priceNote ?? 'вручну'}</>
                         )}
                       </span>
                     </td>

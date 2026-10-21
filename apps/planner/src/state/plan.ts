@@ -78,6 +78,8 @@ export interface Instrument {
   price: number
   /** true = price typed by hand; otherwise the daily justETF quote is used when available. */
   priceManual?: boolean
+  /** Where a non-quote price came from, e.g. «з IBKR, 20.10.2026». */
+  priceNote?: string
 }
 
 export interface Task {

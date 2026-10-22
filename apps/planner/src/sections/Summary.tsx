@@ -5,6 +5,7 @@ import { assetKind } from '../data/assetKinds'
 import { STAGES, STATUSES, type TaskStage } from '../data/templates'
 import { formatMonth } from './Goals'
 import { MARKET_AS_OF } from '../data/assumptions'
+import { DISCLAIMER } from '../data/disclaimer'
 import { formatDate } from './Assumptions'
 import type { SectionProps } from './types'
 
@@ -178,7 +179,7 @@ export function Summary({ plan, d }: SectionProps) {
       </section>
 
       <p className="small muted summary__note">
-        Розрахунок орієнтовний і не є гарантією дохідності. Підготовлено з yulia.profinance.
+        <b>Важливо знати.</b> {DISCLAIMER.join(' ')} Підготовлено з yulia.profinance.
       </p>
     </div>
   )

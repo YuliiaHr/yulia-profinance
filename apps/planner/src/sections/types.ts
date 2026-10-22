@@ -8,4 +8,4 @@ export interface SectionProps {
   go: (step: StepId) => void
 }
 
-export type StepId = 'budget' | 'reserve' | 'protection' | 'goals' | 'assets' | 'freedom' | 'portfolio' | 'actions' | 'summary' | 'assumptions'
+export type StepId = 'intro' | 'budget' | 'reserve' | 'protection' | 'goals' | 'assets' | 'freedom' | 'portfolio' | 'actions' | 'summary' | 'assumptions'

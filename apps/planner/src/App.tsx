@@ -6,6 +6,7 @@ import { Actions } from './sections/Actions'
 import { Assets } from './sections/Assets'
 import { Assumptions } from './sections/Assumptions'
 import { Goals } from './sections/Goals'
+import { Intro } from './sections/Intro'
 import { Portfolio } from './sections/Portfolio'
 import { Protection } from './sections/Protection'
 import { Reserve } from './sections/Reserve'
@@ -17,6 +18,7 @@ import { useNbuRates } from './lib/nbu'
 import { Backup } from './components/Backup'
 
 const STEPS: Array<{ id: StepId; n: string; title: string; short: string; Screen: (p: SectionProps) => JSX.Element }> = [
+  { id: 'intro', n: '0', title: 'Ваш фінансовий план', short: 'Вступ', Screen: Intro },
   { id: 'budget', n: '1', title: 'Доходи і витрати', short: 'Доходи', Screen: Budget },
   { id: 'reserve', n: '2', title: 'Резервний фонд', short: 'Резерв', Screen: Reserve },
   { id: 'protection', n: '3', title: 'Захист', short: 'Захист', Screen: Protection },
@@ -36,7 +38,7 @@ const PAGES = [...STEPS, ...EXTRA_PAGES]
 
 const stepFromHash = (): StepId => {
   const h = window.location.hash.slice(1)
-  return PAGES.some((s) => s.id === h) ? (h as StepId) : 'budget'
+  return PAGES.some((s) => s.id === h) ? (h as StepId) : 'intro'
 }
 
 export default function App() {
@@ -76,7 +78,7 @@ export default function App() {
             <select id="plan-select" value={plan.id} onChange={(e) => select(e.target.value)}>
               {plans.map((p) => <option key={p.id} value={p.id}>{p.client || 'Без імені'}</option>)}
             </select>
-            <button type="button" className="btn btn--sm" onClick={() => { create(); go('budget') }}>+ Новий клієнт</button>
+            <button type="button" className="btn btn--sm" onClick={() => { create(); go('intro') }}>+ Новий клієнт</button>
           </div>
         </div>
       </header>
@@ -123,7 +125,7 @@ export default function App() {
         <h1 className="no-print">{current.title}</h1>
         <current.Screen {...props} />
 
-        {next && (
+        {next && step !== 'intro' && (
           <div className="next no-print">
             <button type="button" className="btn btn--ink" onClick={() => go(next.id)}>Далі: {next.title} →</button>
           </div>

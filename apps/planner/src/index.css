@@ -77,6 +77,26 @@ h3 { font: 800 17px/1.25 var(--font-brand); letter-spacing: -.01em; margin-botto
 }
 @media (max-width: 520px) { .bar__plans { margin-left: 0; width: 100%; } .bar select { flex: 1; max-width: none; } }
 
+/* ---------- intro ---------- */
+.intro { max-width: 760px; display: grid; gap: 28px; }
+.intro .lead { margin: 0; }
+.intro__block h2 { font-size: clamp(20px, 2.6vw, 26px); margin-bottom: 14px; }
+.intro__steps { margin: 0 0 22px; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 14px; }
+.intro__steps li { counter-increment: s; position: relative; padding-left: 48px; line-height: 1.5; }
+.intro__steps li::before {
+  content: counter(s); position: absolute; left: 0; top: -2px; width: 32px; height: 32px; border-radius: 50%;
+  display: grid; place-items: center; background: var(--ink); color: var(--cream); font: 800 14px/1 var(--font-brand);
+}
+.intro__term { text-decoration: underline dotted var(--accent) 2px; text-underline-offset: 4px; }
+.intro__privacy { padding: 20px 22px; border-radius: 8px; background: var(--field); border: 1.5px solid var(--line); }
+.intro__privacy p { margin: 0; }
+.intro__note { padding: 20px 22px; border-radius: 8px; background: var(--ink); color: var(--on-ink); }
+.intro__note h2 { color: var(--accent); }
+.intro__note ul { margin: 0 0 12px; padding-left: 20px; display: grid; gap: 8px; font-size: 15px; color: var(--on-ink-2); }
+.intro__note a { color: var(--cream); }
+.intro__sign { margin: 0; font-size: 14px; opacity: .75; }
+.intro__sign a { color: inherit; }
+
 /* ---------- backup ---------- */
 .btn--ghost-ink { background: transparent; border-color: var(--ink); color: var(--ink); }
 .btn--ghost-ink:hover { background: var(--ink); color: var(--cream); border-color: var(--ink); }

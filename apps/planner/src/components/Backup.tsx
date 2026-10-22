@@ -8,6 +8,10 @@ const REMIND_AFTER_DAYS = 14
 interface Props {
   plans: Plan[]
   current: Plan
+  /** Advisor: all-plans copy and opening files. */
+  canManage: boolean
+  /** Cloud mode: plans are saved automatically, the copy is optional. */
+  cloud: boolean
   onImport: (plans: Plan[]) => MergeResult
 }
 
@@ -21,7 +25,7 @@ function readLast(): number | null {
 }
 
 /** Save all plans to a file / restore them from a file. */
-export function Backup({ plans, current, onImport }: Props) {
+export function Backup({ plans, current, canManage, cloud, onImport }: Props) {
   const input = useRef<HTMLInputElement>(null)
   const [last, setLast] = useState<number | null>(readLast)
   const [message, setMessage] = useState<string | null>(null)
@@ -39,6 +43,7 @@ export function Backup({ plans, current, onImport }: Props) {
   const saveOne = () => {
     setChanges([])
     download([current], planFileName(current.client))
+    if (cloud) return setMessage('План збережено у файл.')
     setMessage(
       `Збережено план «${current.client || 'без імені'}». Надішліть файл клієнту особисто разом із посиланням на планер (${location.origin}${location.pathname}). ` +
         'Клієнт натискає «Відкрити файл», заповнює свої дані й так само зберігає план у файл, який повертає вам.',
@@ -89,8 +94,8 @@ export function Backup({ plans, current, onImport }: Props) {
     <div className="backup">
       <div className="backup__buttons">
         <button type="button" className="btn btn--sm btn--ghost-ink" onClick={saveOne}>Зберегти цей план у файл</button>
-        <button type="button" className="btn btn--sm btn--ghost-ink" onClick={save}>Копія всіх планів</button>
-        <button type="button" className="btn btn--sm btn--ghost-ink" onClick={() => input.current?.click()}>Відкрити файл</button>
+        {canManage && <button type="button" className="btn btn--sm btn--ghost-ink" onClick={save}>Копія всіх планів</button>}
+        {canManage && <button type="button" className="btn btn--sm btn--ghost-ink" onClick={() => input.current?.click()}>Відкрити файл</button>}
         <input
           ref={input}
           type="file"
@@ -103,14 +108,14 @@ export function Backup({ plans, current, onImport }: Props) {
           }}
         />
       </div>
-      <p className={`backup__status${remind ? ' is-remind' : ''}`}>
+      {canManage && !cloud && <p className={`backup__status${remind ? ' is-remind' : ''}`}>
         {days === null
           ? 'Копію планів ще не зберігали'
           : days === 0
             ? 'Копію збережено сьогодні'
             : `Остання копія — ${days} дн. тому`}
         {remind && ' · збережіть копію, щоб не втратити дані'}
-      </p>
+      </p>}
       {message && <p className="backup__message" role="status">{message}</p>}
       {changes.length > 0 && (
         <ul className="backup__changes">

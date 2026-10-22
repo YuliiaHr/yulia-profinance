@@ -1,19 +1,22 @@
 import { useState } from 'react'
 import { uid, type Comment, type Plan } from '../state/plan'
-import { AUTHOR_LABEL, useRole } from '../state/role'
+import { AUTHOR_LABEL } from '../state/role'
+import type { Author } from '../state/plan'
 
 interface Props {
   step: string
   plan: Plan
   update: (change: (p: Plan) => Plan) => void
+  role: Author
+  /** Local mode only: let the user say who is writing. */
+  setRole?: (r: Author) => void
 }
 
 const when = (at: number) =>
   new Date(at).toLocaleString('uk-UA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
 
 /** Comment thread at the bottom of each step: questions from the client, notes from the advisor. */
-export function Comments({ step, plan, update }: Props) {
-  const [role, setRole] = useRole()
+export function Comments({ step, plan, update, role, setRole }: Props) {
   const [text, setText] = useState('')
   const list = plan.comments.filter((c) => c.step === step)
   const open = list.filter((c) => !c.resolved).length
@@ -66,14 +69,18 @@ export function Comments({ step, plan, update }: Props) {
           }}
         />
         <div className="comments__actions">
-          <span className="comments__role">
-            Пишу як:
-            {(['advisor', 'client'] as const).map((r) => (
-              <button key={r} type="button" className={`chip-btn chip-btn--sm${role === r ? ' is-active' : ''}`} onClick={() => setRole(r)}>
-                {AUTHOR_LABEL[r]}
-              </button>
-            ))}
-          </span>
+          {setRole ? (
+            <span className="comments__role">
+              Пишу як:
+              {(['advisor', 'client'] as const).map((r) => (
+                <button key={r} type="button" className={`chip-btn chip-btn--sm${role === r ? ' is-active' : ''}`} onClick={() => setRole(r)}>
+                  {AUTHOR_LABEL[r]}
+                </button>
+              ))}
+            </span>
+          ) : (
+            <span className="comments__role">Пишу як: <b>{AUTHOR_LABEL[role]}</b></span>
+          )}
           <button type="button" className="btn btn--sm" onClick={add} disabled={!text.trim()}>Додати коментар</button>
         </div>
       </div>

@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { examplePlan, newPlan, type Plan } from './plan'
-import { guessKind } from '../data/assetKinds'
+import { upgrade } from './upgrade'
+import type { PlansApi } from './api'
 import { mergePlans } from './backup'
-import { setRole, setRoleIfUnknown } from './role'
+import { setRole, setRoleIfUnknown, useRole } from './role'
 
 /** Everything stays in this browser (decision in docs/decisions.md). */
 const KEY = 'yp.planner.v1'
@@ -27,16 +28,10 @@ function load(): Saved {
   return { plans: [p], currentId: p.id }
 }
 
-function upgrade(p: Plan): Plan {
-  const fresh = newPlan()
-  // Plans in hryvnias are no longer supported: switch to dollars (rare, early test plans).
-  const currency = (p.currency as string) === 'UAH' ? 'USD' : p.currency
-  const assets = (p.assets ?? []).map((a) => (a.kind ? a : { ...a, kind: guessKind(a.name) }))
-  return { ...fresh, ...p, currency, assets, reserve: { ...fresh.reserve, ...p.reserve } }
-}
-
-export function usePlans() {
+/** Local mode: plans stay in this browser. */
+export function useLocalPlans(): PlansApi {
   const [state, setState] = useState<Saved>(load)
+  const [role, setRoleState] = useRole()
 
   useEffect(() => {
     try {
@@ -81,5 +76,5 @@ export function usePlans() {
     return merged
   }
 
-  return { plans: state.plans, plan, update, select, create, remove, importPlans }
+  return { mode: 'local', plans: state.plans, plan, update, select, create, remove, importPlans, role, setRole: setRoleState, canManage: true }
 }

@@ -96,5 +96,14 @@ begin
   where id = uid;
 end $$;
 
+-- Explicit grants: works even when the project does not expose new tables automatically.
+-- Row-level security above still decides which rows each user can see.
+grant usage on schema public to anon, authenticated;
+revoke all on public.plans, public.advisors from anon;
+grant select, insert, update, delete on public.plans to authenticated;
+grant select on public.advisors to authenticated;
+revoke execute on function public.is_advisor(), public.link_client(text, text), public.unlink_client(text), public.reset_client_password(text, text) from public, anon;
+grant execute on function public.is_advisor(), public.link_client(text, text), public.unlink_client(text), public.reset_client_password(text, text) to authenticated;
+
 -- After Юлія has signed up in the planner, make her the advisor (replace the email):
 -- insert into public.advisors select id from auth.users where email = 'yulia@example.com' on conflict do nothing;

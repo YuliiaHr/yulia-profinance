@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { examplePlan, newPlan, type Plan } from './plan'
 import { guessKind } from '../data/assetKinds'
 import { mergePlans } from './backup'
+import { setRole, setRoleIfUnknown } from './role'
 
 /** Everything stays in this browser (decision in docs/decisions.md). */
 const KEY = 'yp.planner.v1'
@@ -57,6 +58,7 @@ export function usePlans() {
   const select = (id: string) => setState((s) => ({ ...s, currentId: id }))
 
   const create = () => {
+    setRole('advisor')
     const p = newPlan()
     setState((s) => ({ plans: [...s.plans, p], currentId: p.id }))
   }
@@ -73,6 +75,8 @@ export function usePlans() {
     const merged = mergePlans(state.plans, incoming.map(upgrade))
     // A file with one plan (from or for a client) opens that plan straight away.
     const open = incoming.length === 1 ? incoming[0].id : null
+    // A browser that has only ever opened a plan from a file belongs to a client.
+    if (open && merged.added) setRoleIfUnknown('client')
     setState((s) => ({ ...s, plans: merged.plans, currentId: open ?? s.currentId }))
     return merged
   }

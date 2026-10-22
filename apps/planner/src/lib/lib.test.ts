@@ -236,3 +236,22 @@ describe('backup', () => {
     expect(r.plans).toHaveLength(3)
   })
 })
+
+import { diffPlans } from '../state/diff'
+
+describe('diffPlans', () => {
+  it('lists what the client changed', () => {
+    const a = newPlan('Олена')
+    const b = structuredClone(a)
+    b.income[0].amount = 60000
+    b.goals.push({ id: 'g', name: 'Авто', cost: 8000, saved: 0, date: '2028-01' })
+    b.freedom.retireAge = 55
+    b.comments.push({ id: 'c', step: 'budget', author: 'client', text: '?', at: 1, resolved: false })
+    const d = diffPlans(a, b)
+    expect(d).toContain('Доходи · Зарплата: 0 ₴ → 60\u00a0000 ₴')
+    expect(d).toContain('Цілі · додано «Авто»: 8\u00a0000 $ до 2028-01')
+    expect(d).toContain('Свобода · вихід на пенсію: 60 → 55')
+    expect(d).toContain('Нових коментарів: 1')
+    expect(diffPlans(a, structuredClone(a))).toEqual([])
+  })
+})

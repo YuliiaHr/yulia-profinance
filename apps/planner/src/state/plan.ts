@@ -92,6 +92,18 @@ export interface Task {
   link?: string
 }
 
+export type Author = 'advisor' | 'client'
+
+export interface Comment {
+  id: string
+  /** Step the comment belongs to (StepId). */
+  step: string
+  author: Author
+  text: string
+  at: number
+  resolved: boolean
+}
+
 export interface Plan {
   id: string
   client: string
@@ -119,6 +131,7 @@ export interface Plan {
   tasks: Task[]
   goals: Goal[]
   protection: ChosenInsurance[]
+  comments: Comment[]
   freedom: FreedomSettings
 }
 
@@ -156,6 +169,7 @@ export function newPlan(client = 'Новий клієнт'): Plan {
     tasks: TASKS.map((t) => ({ ...t, id: uid(), status: 'todo' as const, date: '' })),
     goals: [],
     protection: [],
+    comments: [],
     freedom: {
       age: 30, retireAge: 60, lifeAge: 85, saveRate: 0.1, capital: 0,
       returnRate: 0.06, incomeGrowth: 0, inflation: 0.02, income: null, pension: null,

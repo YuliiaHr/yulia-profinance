@@ -1,4 +1,5 @@
 import type { Plan } from './plan'
+import { diffPlans } from './diff'
 
 /** Backup file of all client plans. The file stays with the advisor; nothing is uploaded. */
 export interface BackupFile {
@@ -23,6 +24,8 @@ export interface MergeResult {
   added: number
   updated: number
   kept: number
+  /** For each replaced plan: what changed («Що змінив клієнт»). */
+  changes: Record<string, string[]>
 }
 
 /** Adds plans from a backup: new ones are added, the same plan is replaced only by a newer copy. */
@@ -31,17 +34,19 @@ export function mergePlans(current: Plan[], incoming: Plan[]): MergeResult {
   let added = 0
   let updated = 0
   let kept = 0
+  const changes: Record<string, string[]> = {}
   for (const p of incoming) {
     const existing = byId.get(p.id)
     if (!existing) {
       byId.set(p.id, p)
       added++
     } else if ((p.updatedAt ?? 0) > (existing.updatedAt ?? 0)) {
+      changes[p.id] = diffPlans(existing, p)
       byId.set(p.id, p)
       updated++
     } else kept++
   }
-  return { plans: [...byId.values()], added, updated, kept }
+  return { plans: [...byId.values()], added, updated, kept, changes }
 }
 
 export const planFileName = (client: string, now = new Date()) =>

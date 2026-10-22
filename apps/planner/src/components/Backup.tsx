@@ -25,6 +25,7 @@ export function Backup({ plans, current, onImport }: Props) {
   const input = useRef<HTMLInputElement>(null)
   const [last, setLast] = useState<number | null>(readLast)
   const [message, setMessage] = useState<string | null>(null)
+  const [changes, setChanges] = useState<string[]>([])
 
   const download = (list: Plan[], name: string) => {
     const blob = new Blob([JSON.stringify(makeBackup(list), null, 2)], { type: 'application/json' })
@@ -36,6 +37,7 @@ export function Backup({ plans, current, onImport }: Props) {
   }
 
   const saveOne = () => {
+    setChanges([])
     download([current], planFileName(current.client))
     setMessage(
       `Збережено план «${current.client || 'без імені'}». Надішліть файл клієнту особисто разом із посиланням на планер (${location.origin}${location.pathname}). ` +
@@ -44,6 +46,7 @@ export function Backup({ plans, current, onImport }: Props) {
   }
 
   const save = () => {
+    setChanges([])
     download(plans, backupFileName())
     const now = Date.now()
     try {
@@ -59,10 +62,11 @@ export function Backup({ plans, current, onImport }: Props) {
     try {
       const incoming = readBackup(await file.text())
       const r = onImport(incoming)
+      setChanges(incoming.length === 1 ? r.changes[incoming[0].id] ?? [] : [])
       if (incoming.length === 1) {
         setMessage(
           r.added ? `Відкрито новий план «${incoming[0].client}».`
-            : r.updated ? `План «${incoming[0].client}» оновлено версією з файлу.`
+            : r.updated ? `План «${incoming[0].client}» оновлено версією з файлу. ${(r.changes[incoming[0].id] ?? []).length ? 'Що змінилося:' : 'Змін у цифрах немає.'}`
               : `План «${incoming[0].client}» у планері вже новіший або такий самий — нічого не змінено.`,
         )
         return
@@ -108,6 +112,12 @@ export function Backup({ plans, current, onImport }: Props) {
         {remind && ' · збережіть копію, щоб не втратити дані'}
       </p>
       {message && <p className="backup__message" role="status">{message}</p>}
+      {changes.length > 0 && (
+        <ul className="backup__changes">
+          {changes.slice(0, 40).map((c) => <li key={c}>{c}</li>)}
+          {changes.length > 40 && <li>…і ще {changes.length - 40}</li>}
+        </ul>
+      )}
     </div>
   )
 }

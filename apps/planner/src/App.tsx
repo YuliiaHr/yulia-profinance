@@ -16,6 +16,7 @@ import { derive } from './state/derive'
 import { usePlans } from './state/store'
 import { useNbuRates } from './lib/nbu'
 import { Backup } from './components/Backup'
+import { Comments } from './components/Comments'
 
 const STEPS: Array<{ id: StepId; n: string; title: string; short: string; Screen: (p: SectionProps) => JSX.Element }> = [
   { id: 'intro', n: '0', title: 'Ваш фінансовий план', short: 'Вступ', Screen: Intro },
@@ -63,6 +64,8 @@ export default function App() {
     window.scrollTo({ top: 0 })
   }
 
+  const openComments = (id: string) =>
+    id === 'summary' ? plan.comments.filter((c) => !c.resolved).length : plan.comments.filter((c) => c.step === id && !c.resolved).length
   const index = STEPS.findIndex((s) => s.id === step)
   const current = PAGES.find((s) => s.id === step)!
   const next = index >= 0 ? STEPS[index + 1] : undefined
@@ -118,12 +121,14 @@ export default function App() {
             <a key={s.id} href={`#${s.id}`} className="steps__item" aria-current={s.id === step ? 'step' : undefined} onClick={(e) => { e.preventDefault(); go(s.id) }}>
               <span className="steps__n">{s.n}</span>
               <span className="steps__t">{s.short}</span>
+              {openComments(s.id) > 0 && <span className="steps__badge" title="Невирішені коментарі">{openComments(s.id)}</span>}
             </a>
           ))}
         </nav>
 
         <h1 className="no-print">{current.title}</h1>
         <current.Screen {...props} />
+        {step !== 'intro' && step !== 'assumptions' && <Comments step={step} plan={plan} update={update} />}
 
         {next && step !== 'intro' && (
           <div className="next no-print">

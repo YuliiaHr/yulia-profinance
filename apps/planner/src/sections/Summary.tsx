@@ -7,10 +7,11 @@ import { formatMonth } from './Goals'
 import { MARKET_AS_OF } from '../data/assumptions'
 import { DISCLAIMER } from '../data/disclaimer'
 import { formatDate } from './Assumptions'
-import type { SectionProps } from './types'
+import type { SectionProps, StepId } from './types'
+import { AUTHOR_LABEL } from '../state/role'
 
 /** One-page overview of the plan; this is what goes into the PDF. */
-export function Summary({ plan, d }: SectionProps) {
+export function Summary({ plan, d, go }: SectionProps) {
   const c = plan.currency
   const { totals, reserve, freedom: r, freedomInput: input } = d
   const f = plan.freedom
@@ -23,6 +24,20 @@ export function Summary({ plan, d }: SectionProps) {
         <button type="button" className="btn" onClick={() => window.print()}>Зберегти PDF</button>
         <span className="small muted">У вікні друку оберіть «Зберегти як PDF».</span>
       </div>
+
+      {plan.comments.some((c) => !c.resolved) && (
+        <section className="summary__comments no-print">
+          <h3>Невирішені коментарі</h3>
+          <ul>
+            {plan.comments.filter((c) => !c.resolved).map((c) => (
+              <li key={c.id}>
+                <button type="button" className="link-btn" onClick={() => go(c.step as StepId)}>{STEP_NAMES[c.step] ?? c.step}</button>
+                {' · '}<b>{AUTHOR_LABEL[c.author]}:</b> {c.text}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <header className="summary__head">
         <p className="overline">Фінансовий план · {today}</p>
@@ -186,3 +201,8 @@ export function Summary({ plan, d }: SectionProps) {
 }
 
 const IN_CURRENCY: Record<Currency, string> = { USD: 'доларах', EUR: 'євро', UAH: 'гривнях' }
+
+const STEP_NAMES: Record<string, string> = {
+  budget: 'Доходи', reserve: 'Резерв', protection: 'Захист', goals: 'Цілі', assets: 'Активи',
+  freedom: 'Свобода', portfolio: 'Портфель', actions: 'План дій', summary: 'Підсумок',
+}
